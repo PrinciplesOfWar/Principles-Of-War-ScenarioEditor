@@ -1,5 +1,6 @@
-from os import path, makedirs
 from json import dump
+from os import makedirs, path
+
 from inquirer import Text, prompt
 
 BASE_DIR = path.dirname(path.abspath(__file__))
@@ -118,22 +119,22 @@ def run():
       <property name="name" value="{scenario_name}"/>
       </properties>
     </objectgroup>
-    <layer id="8" name="objective_faction_1" width="40" height="16">
+    <layer id="8" name="objective_faction_1" width="1" height="1">
       <data encoding="csv">
     25
     </data>
     </layer>
-    <layer id="7" name="objective_faction_0" width="40" height="16">
+    <layer id="7" name="objective_faction_0" width="1" height="1">
       <data encoding="csv">
     25
     </data>
     </layer>
-    <layer id="4" name="landmark" width="40" height="16">
+    <layer id="4" name="landmark" width="1" height="1">
       <data encoding="csv">
     11
     </data>
     </layer>
-    <layer id="3" name="railway" width="40" height="16">
+    <layer id="3" name="railway" width="1" height="1">
       <data encoding="csv">
     16
     </data>

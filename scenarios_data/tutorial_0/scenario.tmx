@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <map version="1.9" tiledversion="1.9.2" orientation="hexagonal" renderorder="left-up" width="11" height="11" tilewidth="120" tileheight="140" infinite="0" hexsidelength="80" staggeraxis="y" staggerindex="odd" nextlayerid="10" nextobjectid="1">
+    <tileset firstgid="1" source="../../resources/tsx/terrain_grass.tsx"/>
+    <tileset firstgid="2" source="../../resources/tsx/terrain_water.tsx"/>
+    <tileset firstgid="3" source="../../resources/tsx/terrain_mountain.tsx"/>
+    <tileset firstgid="4" source="../../resources/tsx/terrain_sand.tsx"/>
+    <tileset firstgid="5" source="../../resources/tsx/terrain_mud.tsx"/>
+    <tileset firstgid="6" source="../../resources/tsx/terrain_snow.tsx"/>
+    <tileset firstgid="7" source="../../resources/tsx/terrain_forest.tsx"/>
+    <tileset firstgid="8" source="../../resources/tsx/faction_n.tsx"/>
+    <tileset firstgid="9" source="../../resources/tsx/faction_0.tsx"/>
+    <tileset firstgid="10" source="../../resources/tsx/faction_1.tsx"/>
+    <tileset firstgid="11" source="../../resources/tsx/landmark_default.tsx"/>
+    <tileset firstgid="12" source="../../resources/tsx/landmark_city.tsx"/>
+    <tileset firstgid="13" source="../../resources/tsx/landmark_depot.tsx"/>
+    <tileset firstgid="14" source="../../resources/tsx/landmark_oilfield.tsx"/>
+    <tileset firstgid="15" source="../../resources/tsx/railway_1.tsx"/>
+    <tileset firstgid="16" source="../../resources/tsx/railway_0.tsx"/>
+    <tileset firstgid="17" source="../../resources/tsx/river_0.tsx"/>
+    <tileset firstgid="18" source="../../resources/tsx/river_1.tsx"/>
+    <tileset firstgid="19" source="../../resources/tsx/river_2.tsx"/>
+    <tileset firstgid="20" source="../../resources/tsx/river_3.tsx"/>
+    <tileset firstgid="21" source="../../resources/tsx/river_4.tsx"/>
+    <tileset firstgid="22" source="../../resources/tsx/river_5.tsx"/>
+    <tileset firstgid="23" source="../../resources/tsx/river_6.tsx"/>
+    <tileset firstgid="24" source="../../resources/tsx/river_7.tsx"/>
+    <tileset firstgid="25" source="../../resources/tsx/objective_0.tsx"/>
+    <tileset firstgid="26" source="../../resources/tsx/objective_1.tsx"/>
+    <tileset firstgid="27" source="../../resources/tsx/port_0.tsx"/>
+    <tileset firstgid="28" source="../../resources/tsx/port_1.tsx"/>
+    <objectgroup id="5" name="metadata">
+      <properties>
+      <property name="creator" value="YoloHanSolo"/>
+      <property name="filename" value="tutorial_0.json"/>
+      <property name="id" value="tutorial_0"/>
+      <property name="name" value="Tutorial 0"/>
+      </properties>
+    </objectgroup>
+    <layer id="8" name="objective_faction_1" width="11" height="11">
+      <data encoding="csv">
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25
+    </data>
+    </layer>
+    <layer id="7" name="objective_faction_0" width="11" height="11">
+      <data encoding="csv">
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25,
+    25,25,25,25,25,25,25,25,25,25,25
+    </data>
+    </layer>
+    <layer id="4" name="landmark" width="11" height="11">
+      <data encoding="csv">
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    13,11,11,11,11,11,11,11,11,11,13,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11,
+    11,11,11,11,11,11,11,11,11,11,11
+    </data>
+    </layer>
+    <layer id="3" name="railway" width="11" height="11">
+      <data encoding="csv">
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16,
+    16,16,16,16,16,16,16,16,16,16,16
+    </data>
+    </layer>
+    <layer id="6" name="river" width="11" height="11">
+      <data encoding="csv">
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,17,17
+    </data>
+    </layer>
+    <layer id="2" name="front" width="11" height="11">
+      <data encoding="csv">
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10,
+    9,9,9,9,9,10,10,10,10,10,10
+    </data>
+    </layer>
+    <layer id="1" name="terrain" width="11" height="11">
+      <data encoding="csv">
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1
+    </data>
+    </layer>
+    <layer id="9" name="port" width="11" height="11">
+      <data encoding="csv">
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27,
+    27,27,27,27,27,27,27,27,27,27,27
+    </data>
+    </layer>
+    </map>
+  

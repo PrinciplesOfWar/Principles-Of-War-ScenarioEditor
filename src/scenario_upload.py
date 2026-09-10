@@ -1,8 +1,10 @@
-from requests import put, post
+from json import dump, load
+from os import listdir, makedirs, path
 from sys import exit
-from json import load, dump
-from os import listdir, path, makedirs
-from inquirer import Text, Password, List, Confirm, prompt
+
+from inquirer import Confirm, List, Password, Text, prompt
+from requests import post, put
+
 from src.types.enums import Stage
 
 BASE_DIR = path.dirname(path.abspath(__file__))

@@ -1,8 +1,9 @@
-from os import listdir, path
 from json import load
-from inquirer import List, prompt
-from PIL import Image, ImageFont, ImageDraw
+from os import listdir, path
 from random import Random, randint
+
+from inquirer import List, prompt
+from PIL import Image, ImageDraw, ImageFont
 
 BASE_DIR = path.dirname(path.abspath(__file__))
 ROOT_DIR = path.abspath(path.join(BASE_DIR, ".."))

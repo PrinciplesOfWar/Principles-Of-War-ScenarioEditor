@@ -1,7 +1,8 @@
 from json import dump
-from xml.etree import ElementTree
-from sys import exit
 from os import listdir, path
+from sys import exit
+from xml.etree import ElementTree
+
 from inquirer import List, prompt
 
 BASE_DIR = path.dirname(path.abspath(__file__))

@@ -1,12 +1,14 @@
-from os import listdir, path
-from json import load, dump, dumps
 from base64 import b64encode
+from hashlib import md5
+from json import dump, dumps, load
+from os import listdir, path
 from sys import exit
 from time import time
-from hashlib import md5
 from xml.etree import ElementTree
-from src.models.scenario_object import ScenarioObject
+
 from inquirer import List, prompt
+
+from src.models.scenario_object import ScenarioObject
 
 BASE_DIR = path.dirname(path.abspath(__file__))
 ROOT_DIR = path.abspath(path.join(BASE_DIR, ".."))

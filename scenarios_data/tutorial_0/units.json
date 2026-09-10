@@ -1,0 +1,20 @@
+[
+	{
+		"x": 4,
+		"y": 5,
+		"faction": "red",
+		"unit_type": "red_infantry",
+		"attack": 3,
+		"defense": 3,
+		"movement": 3
+	},
+	{
+		"x": 6,
+		"y": 5,
+		"faction": "blue",
+		"unit_type": "blue_infantry",
+		"attack": 0,
+		"defense": 2,
+		"movement": 0
+	}
+]
