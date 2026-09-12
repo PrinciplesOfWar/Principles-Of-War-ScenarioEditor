@@ -1,0 +1,29 @@
+[
+	{
+		"x": 5,
+		"y": 3,
+		"faction": "red",
+		"unit_type": "red_infantry",
+		"attack": 1,
+		"defense": 1,
+		"movement": 1
+	},
+	{
+		"x": 5,
+		"y": 5,
+		"faction": "red",
+		"unit_type": "red_infantry",
+		"attack": 1,
+		"defense": 1,
+		"movement": 1
+	},
+	{
+		"x": 6,
+		"y": 5,
+		"faction": "blue",
+		"unit_type": "blue_infantry",
+		"attack": 0,
+		"defense": 1,
+		"movement": 0
+	}
+]

@@ -1,0 +1,30 @@
+{
+    "red": {
+        "id": "faction_0",
+        "name": "red",
+        "manpower_points": 0,
+        "manpower_income": 0,
+        "manpower_cap": 0,
+        "fuel_points": 0,
+        "fuel_income": 0,
+        "fuel_cap": 0,
+        "airpower_points": 0,
+        "airpower_income": 0,
+        "airpower_cap": 0,
+        "units_cap": 1
+    },
+    "blue": {
+        "id": "faction_1",
+        "name": "blue",
+        "manpower_points": 0,
+        "manpower_income": 0,
+        "manpower_cap": 0,
+        "fuel_points": 0,
+        "fuel_income": 0,
+        "fuel_cap": 0,
+        "airpower_points": 0,
+        "airpower_income": 0,
+        "airpower_cap": 0,
+        "units_cap": 1
+    }
+}
