@@ -45,10 +45,13 @@ export function pixelToHex(px: number, py: number): { x: number; y: number } {
 }
 
 // Corner points for a pointy-top hex centered at (cx, cy)
+// Starts at the top vertex (matches the game engine's HEXAGON_CORNERS convention
+// in src/scenario_generate_preview.py) so edge/river indices line up with the
+// compiled scenario data.
 export function hexCorners(cx: number, cy: number): [number, number][] {
   const corners: [number, number][] = [];
   for (let i = 0; i < 6; i++) {
-    const angleDeg = 60 * i - 30;
+    const angleDeg = 60 * i - 90;
     const angleRad = (Math.PI / 180) * angleDeg;
     corners.push([cx + HEX_SIZE * Math.cos(angleRad), cy + HEX_SIZE * Math.sin(angleRad)]);
   }
@@ -63,23 +66,23 @@ export function hexEdgeMidpoint(cx: number, cy: number, edge: number): [number, 
   return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 }
 
-// Edge index -> direction: 0=E, 1=SE, 2=SW, 3=W, 4=NW, 5=NE
+// Edge index -> direction: 0=NE, 1=E, 2=SE, 3=SW, 4=W, 5=NW
 // (matches hexCorners' angle-based winding: corners[i]->corners[i+1])
 const EVEN_ROW_OFFSETS: [number, number][] = [
+  [0, -1], // NE
   [1, 0], // E
   [0, 1], // SE
   [-1, 1], // SW
   [-1, 0], // W
   [-1, -1], // NW
-  [0, -1], // NE
 ];
 const ODD_ROW_OFFSETS: [number, number][] = [
+  [1, -1], // NE
   [1, 0], // E
   [1, 1], // SE
   [0, 1], // SW
   [-1, 0], // W
   [0, -1], // NW
-  [1, -1], // NE
 ];
 
 export function neighborOffset(x: number, y: number, edge: number): { x: number; y: number } {
