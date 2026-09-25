@@ -6,34 +6,6 @@ export default function FactionsForm() {
   const update = useStore((s) => s.update);
   const names = orderedFactionNames(scenario.factions);
 
-  function addFaction() {
-    update((s) => {
-      const idx = Object.keys(s.factions).length;
-      let name = `faction${idx}`;
-      let n = idx;
-      while (s.factions[name]) {
-        n += 1;
-        name = `faction${n}`;
-      }
-      s.factions[name] = {
-        id: `faction_${idx}`,
-        name,
-        units: { cap: 0 },
-        manpower: { points: 0, income: 0, cap: 0 },
-        fuel: { points: 0, income: 0, cap: 0 },
-        airpower: { points: 0, income: 0, cap: 0 },
-      };
-      return s;
-    });
-  }
-
-  function removeFaction(name: string) {
-    update((s) => {
-      delete s.factions[name];
-      return s;
-    });
-  }
-
   return (
     <div className="panel">
       <h3>Factions</h3>
@@ -103,11 +75,9 @@ export default function FactionsForm() {
                 />
               </fieldset>
             ))}
-            <button onClick={() => removeFaction(name)}>Remove faction</button>
           </div>
         );
       })}
-      <button onClick={addFaction}>Add faction</button>
     </div>
   );
 }
