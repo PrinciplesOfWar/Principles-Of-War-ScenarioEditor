@@ -3,6 +3,42 @@ import { useStore } from "../../state/store";
 import { onAssetLoaded } from "../../lib/assets";
 import { closestEdge, hexToPixel, pixelToHex } from "../../lib/hexGrid";
 import { drawScenario } from "./hexRenderer";
+import type { Hexagon, Scenario } from "../../types/scenario";
+
+function landmarkTooltipContent(scenario: Scenario, hex: Hexagon) {
+  if (hex.landmark === "city") {
+    const c = scenario.landmarks.city.find((l) => l.x === hex.x && l.y === hex.y);
+    if (!c) return null;
+    return (
+      <>
+        <strong>{c.name}</strong>
+        <div>Faction: {c.faction}</div>
+        <div>Population: {c.population}</div>
+      </>
+    );
+  }
+  if (hex.landmark === "oilfield") {
+    const o = scenario.landmarks.oilfield.find((l) => l.x === hex.x && l.y === hex.y);
+    if (!o) return null;
+    return (
+      <>
+        <strong>Oilfield</strong>
+        <div>Production: {o.production}</div>
+      </>
+    );
+  }
+  if (hex.landmark === "supply") {
+    const s = scenario.landmarks.supply.find((l) => l.x === hex.x && l.y === hex.y);
+    if (!s) return null;
+    return (
+      <>
+        <strong>Supply</strong>
+        <div>Faction: {s.faction}</div>
+      </>
+    );
+  }
+  return null;
+}
 
 export default function HexCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,6 +64,9 @@ export default function HexCanvas() {
   const panStart = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
   const [, forceRedraw] = useState(0);
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
+  const [hoverHex, setHoverHex] = useState<{ x: number; y: number; screenX: number; screenY: number } | null>(
+    null
+  );
 
   useEffect(() => {
     if (!referenceImage) {
@@ -139,7 +178,12 @@ export default function HexCanvas() {
         toggleObjective(x, y, "faction_1");
         break;
       case "landmarks":
-        setLandmark(x, y, hex.landmark === activeLandmark ? "default" : activeLandmark);
+        // A hex that already has a landmark is just selected (its data shows in the
+        // sidebar) rather than mutated, so clicking it again never deletes it. Pick
+        // "none" as the active type and click a landmark to remove it instead.
+        if (hex.landmark !== activeLandmark) {
+          setLandmark(x, y, activeLandmark);
+        }
         break;
       case "units":
         // selection only; UnitPanel handles editing for selectedHex
@@ -156,20 +200,44 @@ export default function HexCanvas() {
   function handlePointerDown(e: React.PointerEvent) {
     if (e.button === 1 || e.button === 2 || e.shiftKey) {
       setIsPanning(true);
+      setHoverHex(null);
       panStart.current = { x: e.clientX, y: e.clientY, offsetX: view.offsetX, offsetY: view.offsetY };
     }
   }
 
   function handlePointerMove(e: React.PointerEvent) {
-    if (!isPanning) return;
-    const dx = e.clientX - panStart.current.x;
-    const dy = e.clientY - panStart.current.y;
-    setView((v) => ({ ...v, offsetX: panStart.current.offsetX + dx, offsetY: panStart.current.offsetY + dy }));
+    if (isPanning) {
+      const dx = e.clientX - panStart.current.x;
+      const dy = e.clientY - panStart.current.y;
+      setView((v) => ({ ...v, offsetX: panStart.current.offsetX + dx, offsetY: panStart.current.offsetY + dy }));
+      return;
+    }
+
+    if (!layerSettings.landmarks.visible) {
+      setHoverHex(null);
+      return;
+    }
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const { x: wx, y: wy } = toWorld(e.clientX, e.clientY);
+    const { x, y } = pixelToHex(wx, wy);
+    const hex = scenario.hexagons.find((h) => h.x === x && h.y === y);
+    if (hex && hex.landmark !== "default") {
+      setHoverHex({ x, y, screenX: e.clientX - rect.left, screenY: e.clientY - rect.top });
+    } else {
+      setHoverHex(null);
+    }
   }
 
   function handlePointerUp() {
     setIsPanning(false);
   }
+
+  const hoverTooltip = (() => {
+    if (!hoverHex) return null;
+    const hex = scenario.hexagons.find((h) => h.x === hoverHex.x && h.y === hoverHex.y);
+    if (!hex) return null;
+    return landmarkTooltipContent(scenario, hex);
+  })();
 
   return (
     <div ref={containerRef} className="hex-canvas-container">
@@ -180,6 +248,7 @@ export default function HexCanvas() {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerLeave={() => setHoverHex(null)}
         onContextMenu={(e) => e.preventDefault()}
       />
       <div className="zoom-controls">
@@ -188,6 +257,11 @@ export default function HexCanvas() {
         <button onClick={() => zoomBy(1.2)}>+</button>
         <button onClick={resetView}>Reset</button>
       </div>
+      {hoverHex && hoverTooltip && (
+        <div className="landmark-tooltip" style={{ left: hoverHex.screenX, top: hoverHex.screenY }}>
+          {hoverTooltip}
+        </div>
+      )}
     </div>
   );
 }

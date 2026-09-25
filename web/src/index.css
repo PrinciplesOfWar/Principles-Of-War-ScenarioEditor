@@ -158,6 +158,25 @@ body,
   font-size: 12px;
 }
 
+.landmark-tooltip {
+  position: absolute;
+  transform: translate(14px, 14px);
+  background: rgba(38, 40, 52, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.landmark-tooltip strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
 .right-col {
   flex: none;
   border-left: 1px solid var(--border);

@@ -74,17 +74,21 @@ export default function ToolPanel() {
         <>
           <label>Landmark type to paint</label>
           <div className="swatches">
-            {LANDMARK_TYPES.filter((l) => l !== "default").map((l) => (
+            {LANDMARK_TYPES.map((l) => (
               <button
                 key={l}
                 className={activeLandmark === l ? "active" : ""}
                 onClick={() => setActiveLandmark(l)}
               >
-                {l}
+                {l === "default" ? "none" : l}
               </button>
             ))}
           </div>
-          <p className="hint">Click a hex to set/clear this landmark; edit details below.</p>
+          <p className="hint">
+            Click an empty hex to place the selected landmark type. Clicking a hex that already
+            has a landmark just selects it so you can edit its details below — pick "none" and
+            click a landmark to remove it instead.
+          </p>
           {selectedHex && <LandmarkDetail x={selectedHex.x} y={selectedHex.y} />}
         </>
       )}
