@@ -1,4 +1,5 @@
 import { useStore } from "../../state/store";
+import { orderedFactionNames } from "../../types/scenario";
 
 export default function UnitPanel() {
   const selectedHex = useStore((s) => s.selectedHex);
@@ -11,7 +12,7 @@ export default function UnitPanel() {
   const { x, y } = selectedHex;
   const unitsHere = scenario.units.filter((u) => u.x === x && u.y === y);
   const unitTypeIds = Object.keys(scenario.unit_types);
-  const factionNames = Object.keys(scenario.factions);
+  const factionNames = orderedFactionNames(scenario.factions);
 
   function addUnit() {
     const firstType = unitTypeIds[0];

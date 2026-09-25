@@ -53,6 +53,19 @@ export interface Faction {
 
 export type Factions = Record<string, Faction>;
 
+// Faction display/paint order must stay stable (faction 0 before faction 1, ...)
+// even after a faction is renamed, which otherwise reorders Object.keys() by moving
+// the renamed key to the end of insertion order. `id` ("faction_0", "faction_1", ...)
+// never changes on rename, so sort by the numeric suffix of `id` instead.
+function factionOrderKey(faction: Faction): number {
+  const match = /_(\d+)$/.exec(faction.id);
+  return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
+}
+
+export function orderedFactionNames(factions: Factions): string[] {
+  return Object.keys(factions).sort((a, b) => factionOrderKey(factions[a]) - factionOrderKey(factions[b]));
+}
+
 export interface Hexagon {
   x: number;
   y: number;

@@ -1,5 +1,5 @@
 import { useStore } from "../../state/store";
-import { LANDMARK_TYPES, TERRAIN_TYPES } from "../../types/scenario";
+import { LANDMARK_TYPES, orderedFactionNames, TERRAIN_TYPES } from "../../types/scenario";
 
 export default function ToolPanel() {
   const activeLayer = useStore((s) => s.activeLayer);
@@ -12,7 +12,7 @@ export default function ToolPanel() {
   const scenario = useStore((s) => s.scenario);
   const selectedHex = useStore((s) => s.selectedHex);
 
-  const factionNames = ["neutral", ...Object.keys(scenario.factions)];
+  const factionNames = ["neutral", ...orderedFactionNames(scenario.factions)];
 
   return (
     <div className="panel">
@@ -194,7 +194,7 @@ function LandmarkDetail({ x, y }: { x: number; y: number }) {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
   const hex = scenario.hexagons.find((h) => h.x === x && h.y === y);
-  const factionNames = ["neutral", ...Object.keys(scenario.factions)];
+  const factionNames = ["neutral", ...orderedFactionNames(scenario.factions)];
   if (!hex || hex.landmark === "default") return null;
 
   if (hex.landmark === "city") {

@@ -1,9 +1,10 @@
 import { useStore } from "../../state/store";
+import { orderedFactionNames } from "../../types/scenario";
 
 export default function FactionsForm() {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
-  const names = Object.keys(scenario.factions);
+  const names = orderedFactionNames(scenario.factions);
 
   function addFaction() {
     update((s) => {

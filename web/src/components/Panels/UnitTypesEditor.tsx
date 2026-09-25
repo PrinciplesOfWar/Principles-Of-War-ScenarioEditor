@@ -1,11 +1,11 @@
 import { useStore } from "../../state/store";
-import { UNIT_BRANCHES } from "../../types/scenario";
+import { orderedFactionNames, UNIT_BRANCHES } from "../../types/scenario";
 import IconUploader from "./IconUploader";
 
 export default function UnitTypesEditor() {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
-  const factionNames = Object.keys(scenario.factions);
+  const factionNames = orderedFactionNames(scenario.factions);
   const ids = Object.keys(scenario.unit_types);
 
   function addUnitType() {
@@ -20,7 +20,7 @@ export default function UnitTypesEditor() {
         id,
         name: id,
         description: "",
-        faction: Object.keys(s.factions)[0] ?? "",
+        faction: orderedFactionNames(s.factions)[0] ?? "",
         branch: "infantry",
         icon: "unknown",
         attack: 1,

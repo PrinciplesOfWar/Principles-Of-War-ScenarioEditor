@@ -7,7 +7,7 @@ import {
   hexWidth,
   neighborOffset,
 } from "../../lib/hexGrid";
-import type { Hexagon, LayerId, LayerSettings, Scenario } from "../../types/scenario";
+import { orderedFactionNames, type Hexagon, type LayerId, type LayerSettings, type Scenario } from "../../types/scenario";
 
 const TERRAIN_COLORS: Record<string, string> = {
   grass: "#6fa84b",
@@ -25,7 +25,7 @@ const FACTION_PALETTE = ["#c82828", "#285ac8", "#2f9e44", "#e8a400", "#9632c8", 
 
 function factionColor(scenario: Scenario, faction: string): string {
   if (faction === "neutral") return "transparent";
-  const idx = Object.keys(scenario.factions).indexOf(faction);
+  const idx = orderedFactionNames(scenario.factions).indexOf(faction);
   return FACTION_PALETTE[idx % FACTION_PALETTE.length] ?? "#888";
 }
 
