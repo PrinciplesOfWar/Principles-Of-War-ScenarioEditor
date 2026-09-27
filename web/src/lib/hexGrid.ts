@@ -108,3 +108,11 @@ export function closestEdge(cx: number, cy: number, px: number, py: number): num
   }
   return best;
 }
+
+// A label can sit on one of the 6 edges or at the hex's center: a click near the
+// middle of the hex targets the center, otherwise it targets the nearest edge.
+export function closestLabelSlot(cx: number, cy: number, px: number, py: number): number | null {
+  const distToCenter = Math.hypot(px - cx, py - cy);
+  if (distToCenter < HEX_SIZE * 0.45) return null;
+  return closestEdge(cx, cy, px, py);
+}

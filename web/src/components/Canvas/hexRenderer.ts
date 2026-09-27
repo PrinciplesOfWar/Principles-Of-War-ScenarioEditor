@@ -7,7 +7,14 @@ import {
   hexWidth,
   neighborOffset,
 } from "../../lib/hexGrid";
-import { orderedFactionNames, type Hexagon, type LayerId, type LayerSettings, type Scenario } from "../../types/scenario";
+import {
+  orderedFactionNames,
+  type Hexagon,
+  type LabelEntry,
+  type LayerId,
+  type LayerSettings,
+  type Scenario,
+} from "../../types/scenario";
 
 const TERRAIN_COLORS: Record<string, string> = {
   grass: "#6fa84b",
@@ -101,6 +108,16 @@ export function drawScenario(
     ctx.restore();
   }
 
+  // Labels are drawn in their own pass too, on top of everything else, so long names
+  // are always fully legible regardless of what's underneath.
+  const labelsAlpha = layerAlpha(layerSettings, "labels");
+  if (labelsAlpha !== null) {
+    ctx.save();
+    ctx.globalAlpha = labelsAlpha;
+    drawLabels(ctx, scenario.labels);
+    ctx.restore();
+  }
+
   // Logistics (railway) network is drawn as hub-and-spoke lines between the centers
   // of adjacent railway hexes, so a hex naturally reads as a dead end, a through-line,
   // a turn, or a hub depending on how many of its neighbors also have railway.
@@ -130,6 +147,26 @@ function drawRiverEdges(ctx: CanvasRenderingContext2D, hex: Hexagon) {
       ctx.stroke();
     }
   }
+}
+
+function drawLabels(ctx: CanvasRenderingContext2D, labels: LabelEntry[]) {
+  ctx.font = "10px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (const label of labels) {
+    if (!label.name) continue;
+    const { px, py } = hexToPixel(label.x, label.y);
+    const [tx, ty] = label.edge === null ? [px, py] : hexEdgeMidpoint(px, py, label.edge);
+    const textWidth = ctx.measureText(label.name).width;
+    const w = textWidth + 6;
+    const h = 12;
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillRect(tx - w / 2, ty - h / 2, w, h);
+    ctx.fillStyle = "#fff";
+    ctx.fillText(label.name, tx, ty + 1);
+  }
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
 }
 
 function findHex(scenario: Scenario, x: number, y: number): Hexagon | undefined {
@@ -309,5 +346,18 @@ function drawHex(
       ctx.arc(mx, my, 4, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+
+  if (activeLayer === "labels") {
+    ctx.fillStyle = "rgba(255,165,0,0.6)";
+    for (let edge = 0; edge < 6; edge++) {
+      const [mx, my] = hexEdgeMidpoint(px, py, edge);
+      ctx.beginPath();
+      ctx.arc(mx, my, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 }

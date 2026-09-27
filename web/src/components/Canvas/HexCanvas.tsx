@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../../state/store";
 import { onAssetLoaded } from "../../lib/assets";
-import { closestEdge, hexToPixel, pixelToHex } from "../../lib/hexGrid";
+import { closestEdge, closestLabelSlot, hexToPixel, pixelToHex } from "../../lib/hexGrid";
 import { drawScenario } from "./hexRenderer";
 import type { Hexagon, Scenario } from "../../types/scenario";
 
@@ -56,6 +56,7 @@ export default function HexCanvas() {
   const toggleObjective = useStore((s) => s.toggleObjective);
   const setLandmark = useStore((s) => s.setLandmark);
   const activeLandmark = useStore((s) => s.activeLandmark);
+  const placeOrSelectLabel = useStore((s) => s.placeOrSelectLabel);
   const referenceImage = useStore((s) => s.referenceImage);
   const layerSettings = useStore((s) => s.layerSettings);
 
@@ -177,6 +178,12 @@ export default function HexCanvas() {
       case "objective_enemy":
         toggleObjective(x, y, "faction_1");
         break;
+      case "labels": {
+        const { px, py } = hexToPixel(x, y);
+        const edge = closestLabelSlot(px, py, wx, wy);
+        placeOrSelectLabel(x, y, edge);
+        break;
+      }
       case "landmarks":
         // A hex that already has a landmark is just selected (its data shows in the
         // sidebar) rather than mutated, so clicking it again never deletes it. Pick

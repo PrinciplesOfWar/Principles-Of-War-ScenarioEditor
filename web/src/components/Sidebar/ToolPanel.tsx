@@ -1,5 +1,5 @@
 import { useStore } from "../../state/store";
-import { LANDMARK_TYPES, orderedFactionNames, TERRAIN_TYPES } from "../../types/scenario";
+import { LABEL_TYPES, LANDMARK_TYPES, orderedFactionNames, TERRAIN_TYPES } from "../../types/scenario";
 
 export default function ToolPanel() {
   const activeLayer = useStore((s) => s.activeLayer);
@@ -7,6 +7,9 @@ export default function ToolPanel() {
   const setActiveTerrain = useStore((s) => s.setActiveTerrain);
   const activeLandmark = useStore((s) => s.activeLandmark);
   const setActiveLandmark = useStore((s) => s.setActiveLandmark);
+  const activeLabelType = useStore((s) => s.activeLabelType);
+  const setActiveLabelType = useStore((s) => s.setActiveLabelType);
+  const selectedLabelSlot = useStore((s) => s.selectedLabelSlot);
   const activeFaction = useStore((s) => s.activeFaction);
   const setActiveFaction = useStore((s) => s.setActiveFaction);
   const scenario = useStore((s) => s.scenario);
@@ -68,6 +71,31 @@ export default function ToolPanel() {
           Click a hex to toggle the objective flag for{" "}
           {activeLayer === "objective_player" ? "faction_0" : "faction_1"}.
         </p>
+      )}
+
+      {activeLayer === "labels" && (
+        <>
+          <label>Label type to place</label>
+          <div className="swatches">
+            {LABEL_TYPES.map((t) => (
+              <button
+                key={t}
+                className={activeLabelType === t ? "active" : ""}
+                onClick={() => setActiveLabelType(t)}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+          <p className="hint">
+            Click near a hex edge to place a label on that edge, or near the center to place one
+            at the hex's center. Clicking an existing label selects it so you can edit or remove
+            it below.
+          </p>
+          {selectedHex && selectedLabelSlot && (
+            <LabelDetail x={selectedHex.x} y={selectedHex.y} edge={selectedLabelSlot.edge} />
+          )}
+        </>
       )}
 
       {activeLayer === "landmarks" && (
@@ -294,4 +322,34 @@ function LandmarkDetail({ x, y }: { x: number; y: number }) {
   }
 
   return null;
+}
+
+function LabelDetail({ x, y, edge }: { x: number; y: number; edge: number | null }) {
+  const scenario = useStore((s) => s.scenario);
+  const update = useStore((s) => s.update);
+  const removeLabel = useStore((s) => s.removeLabel);
+  const entry = scenario.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
+  if (!entry) return null;
+
+  return (
+    <div className="detail-form">
+      <p className="hint">{edge === null ? "Center label" : `Edge ${edge} label`}</p>
+      {entry.type === "water" && (
+        <>
+          <label>Name</label>
+          <input
+            value={entry.name}
+            onChange={(e) =>
+              update((s) => {
+                const l = s.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
+                if (l) l.name = e.target.value;
+                return s;
+              })
+            }
+          />
+        </>
+      )}
+      <button onClick={() => removeLabel(x, y, edge)}>Remove label</button>
+    </div>
+  );
 }

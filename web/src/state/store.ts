@@ -5,6 +5,7 @@ import {
   defaultHexagon,
   LAYERS,
   type Hexagon,
+  type LabelType,
   type LandmarkType,
   type LayerId,
   type LayerSettings,
@@ -63,13 +64,16 @@ interface StoreState {
   activeTerrain: TerrainType;
   activeFaction: string;
   activeLandmark: LandmarkType;
+  activeLabelType: LabelType;
   selectedHex: { x: number; y: number } | null;
+  selectedLabelSlot: { edge: number | null } | null;
   layerSettings: Record<LayerId, LayerSettings>;
 
   setActiveLayer: (l: LayerId) => void;
   setActiveTerrain: (t: TerrainType) => void;
   setActiveFaction: (f: string) => void;
   setActiveLandmark: (l: LandmarkType) => void;
+  setActiveLabelType: (t: LabelType) => void;
   selectHex: (x: number, y: number) => void;
   setLayerVisible: (id: LayerId, visible: boolean) => void;
   setLayerOpacity: (id: LayerId, opacity: number) => void;
@@ -95,6 +99,8 @@ interface StoreState {
   toggleRiverEdge: (x: number, y: number, edge: number) => void;
   toggleObjective: (x: number, y: number, which: "faction_0" | "faction_1") => void;
   setLandmark: (x: number, y: number, type: LandmarkType) => void;
+  placeOrSelectLabel: (x: number, y: number, edge: number | null) => void;
+  removeLabel: (x: number, y: number, edge: number | null) => void;
   resizeMap: (width: number, height: number) => void;
 }
 
@@ -136,6 +142,18 @@ function migrateLegacyFactionNames(scenario: Scenario): Scenario {
   return next;
 }
 
+// Projects/imports saved before the labels layer existed have no `labels` array at all.
+// Ones saved while the only label type was still called "river" (before it was renamed
+// to the more general "water") carry that old type value and need it remapped.
+function ensureLabels(scenario: Scenario): Scenario {
+  const labels = scenario.labels ?? [];
+  const migrated = labels.map((l) =>
+    (l.type as string) === "river" ? { ...l, type: "water" as const } : l
+  );
+  if (scenario.labels && migrated.every((l, i) => l === labels[i])) return scenario;
+  return { ...scenario, labels: migrated };
+}
+
 function loadFromStorage(): { projects: Project[]; activeProjectId: string } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -145,7 +163,7 @@ function loadFromStorage(): { projects: Project[]; activeProjectId: string } {
         return {
           projects: parsed.projects.map((p) => ({
             id: p.id,
-            scenario: migrateLegacyFactionNames(p.scenario),
+            scenario: ensureLabels(migrateLegacyFactionNames(p.scenario)),
             past: [],
             future: [],
             referenceImage: p.referenceImage ?? null,
@@ -186,14 +204,17 @@ export const useStore = create<StoreState>((set, get) => ({
   activeTerrain: "grass",
   activeFaction: "neutral",
   activeLandmark: "city",
+  activeLabelType: "water",
   selectedHex: null,
+  selectedLabelSlot: null,
   layerSettings: loadLayerSettings(),
 
   setActiveLayer: (l) => set({ activeLayer: l }),
   setActiveTerrain: (t) => set({ activeTerrain: t }),
   setActiveFaction: (f) => set({ activeFaction: f }),
   setActiveLandmark: (l) => set({ activeLandmark: l }),
-  selectHex: (x, y) => set({ selectedHex: { x, y } }),
+  setActiveLabelType: (t) => set({ activeLabelType: t }),
+  selectHex: (x, y) => set({ selectedHex: { x, y }, selectedLabelSlot: null }),
 
   setLayerVisible: (id, visible) => {
     const next = { ...get().layerSettings, [id]: { ...get().layerSettings[id], visible } };
@@ -220,7 +241,7 @@ export const useStore = create<StoreState>((set, get) => ({
     const id = makeId();
     const next: Project = {
       id,
-      scenario: scenario ?? createEmptyScenario(),
+      scenario: scenario ? ensureLabels(scenario) : createEmptyScenario(),
       past: [],
       future: [],
       referenceImage: null,
@@ -400,6 +421,32 @@ export const useStore = create<StoreState>((set, get) => ({
     });
   },
 
+  placeOrSelectLabel: (x, y, edge) => {
+    const { scenario, activeLabelType } = get();
+    const existing = scenario.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
+    if (!existing) {
+      get().update((s) => {
+        s.labels.push({ x, y, edge, type: activeLabelType, name: "" });
+        return s;
+      });
+    } else if (existing.type !== activeLabelType) {
+      get().update((s) => {
+        const l = s.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
+        if (l) l.type = activeLabelType;
+        return s;
+      });
+    }
+    set({ selectedLabelSlot: { edge } });
+  },
+
+  removeLabel: (x, y, edge) => {
+    get().update((s) => {
+      s.labels = s.labels.filter((l) => !(l.x === x && l.y === y && l.edge === edge));
+      return s;
+    });
+    set({ selectedLabelSlot: null });
+  },
+
   resizeMap: (width, height) => {
     get().update((s) => {
       const old = new Map(s.hexagons.map((h) => [`${h.x},${h.y}`, h]));
@@ -417,6 +464,7 @@ export const useStore = create<StoreState>((set, get) => ({
       s.landmarks.city = s.landmarks.city.filter((l) => inBounds(l.x, l.y));
       s.landmarks.oilfield = s.landmarks.oilfield.filter((l) => inBounds(l.x, l.y));
       s.landmarks.supply = s.landmarks.supply.filter((l) => inBounds(l.x, l.y));
+      s.labels = s.labels.filter((l) => inBounds(l.x, l.y));
       return s;
     });
   },

@@ -12,6 +12,18 @@ export type TerrainType = (typeof TERRAIN_TYPES)[number];
 export const LANDMARK_TYPES = ["default", "city", "oilfield", "supply"] as const;
 export type LandmarkType = (typeof LANDMARK_TYPES)[number];
 
+// Each label sits either on one of a hex's 6 edges (0-5) or at its center (edge: null).
+export const LABEL_TYPES = ["water"] as const;
+export type LabelType = (typeof LABEL_TYPES)[number];
+
+export interface LabelEntry {
+  x: number;
+  y: number;
+  edge: number | null;
+  type: LabelType;
+  name: string;
+}
+
 export const UNIT_BRANCHES = [
   "motorized",
   "infantry",
@@ -159,6 +171,7 @@ export interface Scenario {
   factions: Factions;
   hexagons: Hexagon[];
   landmarks: Landmarks;
+  labels: LabelEntry[];
   time: TimeData;
   turn: TurnData;
   unit_types: UnitTypes;
@@ -225,6 +238,7 @@ export function createEmptyScenario(): Scenario {
     },
     hexagons,
     landmarks: { city: [], oilfield: [], supply: [] },
+    labels: [],
     time: { day: 1, month: 1, year: 2025, increment: 1, seasons: {} },
     turn: { duration: 1000 },
     unit_types: {},
@@ -243,6 +257,7 @@ export type LayerId =
   | "objective_player"
   | "objective_enemy"
   | "landmarks"
+  | "labels"
   | "units";
 
 export const LAYERS: { id: LayerId; label: string }[] = [
@@ -255,6 +270,7 @@ export const LAYERS: { id: LayerId; label: string }[] = [
   { id: "objective_player", label: "Objective (Faction 0)" },
   { id: "objective_enemy", label: "Objective (Faction 1)" },
   { id: "landmarks", label: "Landmarks" },
+  { id: "labels", label: "Labels" },
   { id: "units", label: "Units" },
 ];
 
