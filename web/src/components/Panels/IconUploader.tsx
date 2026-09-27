@@ -13,7 +13,13 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export default function IconUploader({ iconKey }: { iconKey: string }) {
+export default function IconUploader({
+  iconKey,
+  onIconKeyChange,
+}: {
+  iconKey: string;
+  onIconKeyChange: (key: string) => void;
+}) {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
   const icon = scenario.unit_icons[iconKey];
@@ -26,16 +32,21 @@ export default function IconUploader({ iconKey }: { iconKey: string }) {
       return;
     }
     const base64 = await fileToBase64(file);
+    const key = file.name;
     update((s) => {
-      s.unit_icons[iconKey] = base64;
+      s.unit_icons[key] = base64;
       return s;
     });
+    onIconKeyChange(key);
   }
 
   return (
     <div className="icon-uploader">
       {icon && <img src={`data:image/png;base64,${icon}`} alt={iconKey} width={48} height={48} />}
-      <input type="file" accept="image/png" onChange={handleFile} />
+      <label className="file-button">
+        Choose file
+        <input type="file" accept="image/png" onChange={handleFile} />
+      </label>
     </div>
   );
 }
