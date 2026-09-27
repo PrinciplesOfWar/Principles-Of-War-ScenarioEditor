@@ -30,8 +30,10 @@ export interface Metadata {
   width: number;
   height: number;
   timestamp: number;
+  created_at: number;
+  updated_at: number;
   creator: string;
-  version: string;
+  version: number;
   type: string;
   description: string;
 }
@@ -196,8 +198,10 @@ export function createEmptyScenario(): Scenario {
       width,
       height,
       timestamp: 0,
+      created_at: Math.floor(Date.now() / 1000),
+      updated_at: Math.floor(Date.now() / 1000),
       creator: "",
-      version: "",
+      version: 0,
       type: "original",
       description: "",
     },

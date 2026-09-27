@@ -5,6 +5,7 @@
   --text: #e4e4e8;
   --text-dim: #9a9cab;
   --accent: #4c8bf5;
+  --danger: #e5484d;
 
   font: 14px/1.4 system-ui, "Segoe UI", Roboto, sans-serif;
   color: var(--text);
@@ -187,24 +188,28 @@ body,
 }
 
 .tabs {
-  display: flex;
-  flex-wrap: wrap;
+  padding: 8px;
   border-bottom: 1px solid var(--border);
 }
 
-.tabs button {
-  flex: 1 1 auto;
-  border: none;
-  background: transparent;
-  color: var(--text-dim);
-  padding: 8px 6px;
+.tab-select {
+  width: 100%;
+  background: #333647;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 8px;
   cursor: pointer;
   font-size: 12px;
 }
 
-.tabs button.active {
-  color: var(--text);
-  border-bottom: 2px solid var(--accent);
+.tab-select:hover {
+  background: #3f4256;
+}
+
+.tab-select + .tab-select,
+.tab-select + button {
+  margin-top: 8px;
 }
 
 .tab-content {
@@ -311,6 +316,13 @@ textarea {
   resize: vertical;
 }
 
+input:disabled {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-dim);
+  cursor: not-allowed;
+}
+
 .swatches {
   display: flex;
   flex-wrap: wrap;
@@ -344,6 +356,33 @@ textarea {
   margin-bottom: 12px;
 }
 
+.field-error {
+  color: var(--danger);
+  font-size: 11px;
+  margin: 2px 0 0;
+}
+
+input.invalid {
+  border-color: var(--danger);
+}
+
+.pending-actions {
+  margin-top: 10px;
+}
+
+.pending-actions button.save {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.pending-actions button.save:disabled {
+  background: #333647;
+  border-color: var(--border);
+  color: var(--text-dim);
+  cursor: not-allowed;
+}
+
 fieldset {
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -368,10 +407,30 @@ legend {
   align-items: center;
   gap: 8px;
   margin-top: 4px;
+  margin-bottom: 8px;
 }
 
 .icon-uploader img {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: #000;
+}
+
+.file-button {
+  display: inline-block;
+  background: #333647;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.file-button:hover {
+  background: #3f4256;
+}
+
+.file-button input[type="file"] {
+  display: none;
 }

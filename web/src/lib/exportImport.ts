@@ -6,14 +6,29 @@ export function computeScenarioForExport(scenario: Scenario): Scenario {
   // Mirrors src/scenario_compile.py: hash is computed while metadata.hash is "" and
   // metadata.timestamp is still its pre-set value ("") — timestamp is only assigned
   // to a real epoch value AFTER the hash is taken, so it must be excluded the same way here.
+  // updated_at and version change on every save too, so they are excluded from hashing the same way.
   const forHashing: Scenario = {
     ...scenario,
-    metadata: { ...scenario.metadata, hash: "", timestamp: "" as unknown as number },
+    metadata: {
+      ...scenario.metadata,
+      hash: "",
+      timestamp: "" as unknown as number,
+      updated_at: "" as unknown as number,
+      version: 0,
+    },
   };
   const hash = md5(pyDumpsSorted(forHashing));
+  const now = Math.floor(Date.now() / 1000);
   return {
     ...scenario,
-    metadata: { ...scenario.metadata, hash, timestamp: Math.floor(Date.now() / 1000) },
+    metadata: {
+      ...scenario.metadata,
+      hash,
+      timestamp: now,
+      created_at: scenario.metadata.created_at ?? now,
+      updated_at: now,
+      version: scenario.metadata.version == null ? 0 : scenario.metadata.version + 1,
+    },
   };
 }
 

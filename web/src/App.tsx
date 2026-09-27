@@ -6,6 +6,7 @@ import ToolPanel from "./components/Sidebar/ToolPanel";
 import UnitPanel from "./components/Sidebar/UnitPanel";
 import HexCanvas from "./components/Canvas/HexCanvas";
 import MetadataForm from "./components/Panels/MetadataForm";
+import SizeForm from "./components/Panels/SizeForm";
 import FactionsForm from "./components/Panels/FactionsForm";
 import TimeSeasonsForm from "./components/Panels/TimeSeasonsForm";
 import TurnForm from "./components/Panels/TurnForm";
@@ -14,10 +15,11 @@ import UnitTypesEditor from "./components/Panels/UnitTypesEditor";
 const MIN_SIDEBAR = 180;
 const MAX_SIDEBAR = 600;
 
-type LeftTab = "metadata" | "factions" | "time" | "turn" | "unit_types";
+type LeftTab = "metadata" | "size" | "factions" | "time" | "turn" | "unit_types";
 
 const TABS: { id: LeftTab; label: string }[] = [
   { id: "metadata", label: "Metadata" },
+  { id: "size", label: "Size" },
   { id: "factions", label: "Factions" },
   { id: "time", label: "Time / Seasons" },
   { id: "turn", label: "Turn" },
@@ -35,18 +37,21 @@ export default function App() {
       <div className="app-body">
         <div className="left-col" style={{ width: leftWidth }}>
           <div className="tabs">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                className={tab === t.id ? "active" : ""}
-                onClick={() => setTab(t.id)}
-              >
-                {t.label}
-              </button>
-            ))}
+            <select
+              className="tab-select"
+              value={tab}
+              onChange={(e) => setTab(e.target.value as LeftTab)}
+            >
+              {TABS.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="tab-content">
             {tab === "metadata" && <MetadataForm />}
+            {tab === "size" && <SizeForm />}
             {tab === "factions" && <FactionsForm />}
             {tab === "time" && <TimeSeasonsForm />}
             {tab === "turn" && <TurnForm />}
