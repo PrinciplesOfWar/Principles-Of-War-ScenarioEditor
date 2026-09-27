@@ -34,60 +34,50 @@ export default function TimeSeasonsForm() {
   return (
     <div className="panel">
       <h3>Time</h3>
-      <div className="row">
-        <div>
-          <label>Day</label>
-          <input
-            type="number"
-            value={t.day}
-            onChange={(e) =>
-              update((s) => {
-                s.time.day = Number(e.target.value);
-                return s;
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Month</label>
-          <input
-            type="number"
-            value={t.month}
-            onChange={(e) =>
-              update((s) => {
-                s.time.month = Number(e.target.value);
-                return s;
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Year</label>
-          <input
-            type="number"
-            value={t.year}
-            onChange={(e) =>
-              update((s) => {
-                s.time.year = Number(e.target.value);
-                return s;
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Increment</label>
-          <input
-            type="number"
-            value={t.increment}
-            onChange={(e) =>
-              update((s) => {
-                s.time.increment = Number(e.target.value);
-                return s;
-              })
-            }
-          />
-        </div>
-      </div>
+      <label>Day</label>
+      <input
+        type="number"
+        value={t.day}
+        onChange={(e) =>
+          update((s) => {
+            s.time.day = Number(e.target.value);
+            return s;
+          })
+        }
+      />
+      <label>Month</label>
+      <input
+        type="number"
+        value={t.month}
+        onChange={(e) =>
+          update((s) => {
+            s.time.month = Number(e.target.value);
+            return s;
+          })
+        }
+      />
+      <label>Year</label>
+      <input
+        type="number"
+        value={t.year}
+        onChange={(e) =>
+          update((s) => {
+            s.time.year = Number(e.target.value);
+            return s;
+          })
+        }
+      />
+      <label>Increment (days)</label>
+      <input
+        type="number"
+        value={t.increment}
+        onChange={(e) =>
+          update((s) => {
+            s.time.increment = Number(e.target.value);
+            return s;
+          })
+        }
+      />
 
       <h4>Seasons</h4>
       <div className="row">

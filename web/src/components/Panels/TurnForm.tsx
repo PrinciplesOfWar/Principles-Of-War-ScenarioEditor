@@ -7,7 +7,7 @@ export default function TurnForm() {
   return (
     <div className="panel">
       <h3>Turn</h3>
-      <label>Duration</label>
+      <label>Duration (seconds)</label>
       <input
         type="number"
         value={scenario.turn.duration}
