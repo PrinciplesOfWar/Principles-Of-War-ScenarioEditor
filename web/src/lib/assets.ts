@@ -42,6 +42,21 @@ export function getPortImage(): HTMLImageElement {
   return load("/port.png");
 }
 
+// Unit icons live inside the scenario itself (unit_icons, keyed by content hash) rather
+// than as static files, so they're cached/decoded from their base64 data URL instead of
+// going through load()'s path-based cache.
+const unitIconCache = new Map<string, HTMLImageElement>();
+
+export function getUnitIconImage(hash: string, base64: string): HTMLImageElement {
+  const existing = unitIconCache.get(hash);
+  if (existing) return existing;
+  const img = new Image();
+  img.onload = () => notify();
+  img.src = `data:image/png;base64,${base64}`;
+  unitIconCache.set(hash, img);
+  return img;
+}
+
 export function isImageReady(img: HTMLImageElement | null): img is HTMLImageElement {
   return !!img && img.complete && img.naturalWidth > 0;
 }

@@ -1,4 +1,4 @@
-import { getLandmarkImage, getPortImage, getTerrainImage, isImageReady } from "../../lib/assets";
+import { getLandmarkImage, getPortImage, getTerrainImage, getUnitIconImage, isImageReady } from "../../lib/assets";
 import {
   hexCorners,
   hexEdgeMidpoint,
@@ -321,17 +321,27 @@ function drawHex(
   if (unitsAlpha !== null && unitsHere.length > 0) {
     ctx.save();
     ctx.globalAlpha = unitsAlpha;
+    const size = 16;
     const baseY = py + 18;
     unitsHere.forEach((u, i) => {
-      const ux = px - (unitsHere.length - 1) * 6 + i * 12;
-      ctx.beginPath();
-      ctx.arc(ux, baseY, 6, 0, Math.PI * 2);
-      const color = factionColor(scenario, u.faction);
-      ctx.fillStyle = color === "transparent" ? "#888" : color;
-      ctx.fill();
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      const ux = px - (unitsHere.length - 1) * (size / 2) + i * size;
+      const unitType = scenario.unit_types.find((t) => t.id === u.type);
+      const base64 = unitType ? scenario.unit_icons[unitType.icon] : undefined;
+      const iconImg = unitType && base64 ? getUnitIconImage(unitType.icon, base64) : null;
+      if (isImageReady(iconImg)) {
+        ctx.drawImage(iconImg, ux - size / 2, baseY - size / 2, size, size);
+      } else {
+        // Fallback while the icon loads (or when the unit has none assigned yet) —
+        // a faction-colored dot, same as before icons were drawn.
+        ctx.beginPath();
+        ctx.arc(ux, baseY, size / 3, 0, Math.PI * 2);
+        const color = factionColor(scenario, u.faction);
+        ctx.fillStyle = color === "transparent" ? "#888" : color;
+        ctx.fill();
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     });
     ctx.restore();
   }
