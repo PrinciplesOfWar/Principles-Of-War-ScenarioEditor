@@ -143,7 +143,7 @@ function drawRiverEdges(ctx: CanvasRenderingContext2D, hex: HexagonV2) {
   }
 }
 
-const LABEL_SCALE = 3; // 300% of the original size
+const LABEL_SCALE = 2.4; // 300% of the original size, reduced 20%
 
 function drawLabels(ctx: CanvasRenderingContext2D, labels: LabelEntry[]) {
   ctx.font = `${10 * LABEL_SCALE}px sans-serif`;
