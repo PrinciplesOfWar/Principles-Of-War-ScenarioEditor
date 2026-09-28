@@ -116,3 +116,23 @@ export function closestLabelSlot(cx: number, cy: number, px: number, py: number)
   if (distToCenter < HEX_SIZE * 0.45) return null;
   return closestEdge(cx, cy, px, py);
 }
+
+// Every edge is shared by two hexes (hex A's edge E is the same physical edge as its
+// neighbor's edge oppositeEdge(E)), so an edge-anchored label must have exactly one
+// canonical storage slot regardless of which side it was clicked from — otherwise the
+// same edge could silently end up with two independent, unsynced label entries.
+// Edges 0-2 are always canonical; a click on edge 3-5 redirects to that neighbor's
+// (0-2) edge, unless the neighbor is off the map, in which case there's nowhere to
+// redirect to and the clicked hex/edge is used as-is.
+export function canonicalEdgeSlot(
+  x: number,
+  y: number,
+  edge: number | null,
+  width: number,
+  height: number
+): { x: number; y: number; edge: number | null } {
+  if (edge === null || edge < 3) return { x, y, edge };
+  const n = neighborOffset(x, y, edge);
+  if (n.x < 0 || n.x >= width || n.y < 0 || n.y >= height) return { x, y, edge };
+  return { x: n.x, y: n.y, edge: oppositeEdge(edge) };
+}

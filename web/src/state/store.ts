@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { neighborOffset, oppositeEdge } from "../lib/hexGrid";
+import { canonicalEdgeSlot, neighborOffset, oppositeEdge } from "../lib/hexGrid";
 import { LAYERS, type LayerId, type LayerSettings, type ReferenceImage } from "../types/app";
 import {
   createEmptyScenarioV2,
@@ -380,25 +380,31 @@ export const useStore = create<StoreState>((set, get) => ({
 
   placeOrSelectLabel: (x, y, edge) => {
     const { scenario, activeLabelType } = get();
-    const existing = scenario.map.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
+    const c = canonicalEdgeSlot(x, y, edge, scenario.map.width, scenario.map.height);
+    const existing = scenario.map.labels.find((l) => l.x === c.x && l.y === c.y && l.edge === c.edge);
     if (!existing) {
       get().update((s) => {
-        s.map.labels.push({ x, y, edge, type: activeLabelType, name: "" });
+        s.map.labels.push({ x: c.x, y: c.y, edge: c.edge, type: activeLabelType, name: "" });
         return s;
       });
     } else if (existing.type !== activeLabelType) {
       get().update((s) => {
-        const l = s.map.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
+        const l = s.map.labels.find((ll) => ll.x === c.x && ll.y === c.y && ll.edge === c.edge);
         if (l) l.type = activeLabelType;
         return s;
       });
     }
-    set({ selectedLabelSlot: { edge } });
+    // selectedHex is re-anchored to the canonical hex too, so LabelDetail (which reads
+    // selectedHex + selectedLabelSlot together) always looks up the same slot the label
+    // is actually stored at, regardless of which side of the edge was clicked.
+    set({ selectedHex: { x: c.x, y: c.y }, selectedLabelSlot: { edge: c.edge } });
   },
 
   removeLabel: (x, y, edge) => {
+    const { scenario } = get();
+    const c = canonicalEdgeSlot(x, y, edge, scenario.map.width, scenario.map.height);
     get().update((s) => {
-      s.map.labels = s.map.labels.filter((l) => !(l.x === x && l.y === y && l.edge === edge));
+      s.map.labels = s.map.labels.filter((l) => !(l.x === c.x && l.y === c.y && l.edge === c.edge));
       return s;
     });
     set({ selectedLabelSlot: null });
