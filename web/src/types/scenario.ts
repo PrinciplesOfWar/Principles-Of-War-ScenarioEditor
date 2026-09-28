@@ -1,38 +1,8 @@
-export const TERRAIN_TYPES = [
-  "grass",
-  "forest",
-  "mud",
-  "sand",
-  "snow",
-  "mountain",
-  "water",
-] as const;
-export type TerrainType = (typeof TERRAIN_TYPES)[number];
-
-export const LANDMARK_TYPES = ["default", "city", "oilfield", "supply"] as const;
-export type LandmarkType = (typeof LANDMARK_TYPES)[number];
-
-// Each label sits either on one of a hex's 6 edges (0-5) or at its center (edge: null).
-export const LABEL_TYPES = ["water"] as const;
-export type LabelType = (typeof LABEL_TYPES)[number];
-
-export interface LabelEntry {
-  x: number;
-  y: number;
-  edge: number | null;
-  type: LabelType;
-  name: string;
-}
-
-export const UNIT_BRANCHES = [
-  "motorized",
-  "infantry",
-  "leader",
-  "fortification",
-  "naval",
-  "light_infantry",
-] as const;
-export type UnitBranch = (typeof UNIT_BRANCHES)[number];
+// The v1 scenario file schema. Kept only as the input shape for lib/convertV1ToV2.ts —
+// no live editing code in this app reads or writes this shape anymore (see
+// web/docs/scenario-schema-v2.md and types/scenarioV2.ts for the format the editor
+// actually works with).
+import type { LabelEntry, LandmarkType, TerrainType, TimeData, TurnData, UnitBranch } from "./scenarioV2";
 
 export interface Metadata {
   id: string;
@@ -66,19 +36,6 @@ export interface Faction {
 }
 
 export type Factions = Record<string, Faction>;
-
-// Faction display/paint order must stay stable (faction 0 before faction 1, ...)
-// even after a faction is renamed, which otherwise reorders Object.keys() by moving
-// the renamed key to the end of insertion order. `id` ("faction_0", "faction_1", ...)
-// never changes on rename, so sort by the numeric suffix of `id` instead.
-function factionOrderKey(faction: Faction): number {
-  const match = /_(\d+)$/.exec(faction.id);
-  return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
-}
-
-export function orderedFactionNames(factions: Factions): string[] {
-  return Object.keys(factions).sort((a, b) => factionOrderKey(factions[a]) - factionOrderKey(factions[b]));
-}
 
 export interface Hexagon {
   x: number;
@@ -116,25 +73,6 @@ export interface Landmarks {
   city: CityLandmark[];
   oilfield: OilfieldLandmark[];
   supply: SupplyLandmark[];
-}
-
-export interface SeasonRule {
-  to: TerrainType;
-  probability: number;
-}
-
-export type SeasonEntry = Partial<Record<TerrainType, SeasonRule>>;
-
-export interface TimeData {
-  day: number;
-  month: number;
-  year: number;
-  increment: number;
-  seasons: Record<string, SeasonEntry>; // key: "DD-MM"
-}
-
-export interface TurnData {
-  duration: number;
 }
 
 export interface UnitTypeDef {
@@ -177,114 +115,4 @@ export interface Scenario {
   unit_types: UnitTypes;
   units: UnitInstance[];
   unit_icons: UnitIcons;
-}
-
-export function defaultHexagon(x: number, y: number): Hexagon {
-  return {
-    x,
-    y,
-    terrain: "grass",
-    faction: "neutral",
-    landmark: "default",
-    railway: false,
-    river: [false, false, false, false, false, false],
-    port: false,
-    objective: { faction_0: false, faction_1: false },
-  };
-}
-
-export function createEmptyScenario(): Scenario {
-  const width = 11;
-  const height = 11;
-  const hexagons: Hexagon[] = [];
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      hexagons.push(defaultHexagon(x, y));
-    }
-  }
-  return {
-    metadata: {
-      id: "new_scenario",
-      name: "New Scenario",
-      filename: "new_scenario.json",
-      hash: "",
-      width,
-      height,
-      timestamp: 0,
-      created_at: Math.floor(Date.now() / 1000),
-      updated_at: Math.floor(Date.now() / 1000),
-      creator: "",
-      version: 0,
-      type: "original",
-      description: "",
-    },
-    factions: {
-      "faction 0": {
-        id: "faction_0",
-        name: "faction 0",
-        units: { cap: 0 },
-        manpower: { points: 0, income: 0, cap: 0 },
-        fuel: { points: 0, income: 0, cap: 0 },
-        airpower: { points: 0, income: 0, cap: 0 },
-      },
-      "faction 1": {
-        id: "faction_1",
-        name: "faction 1",
-        units: { cap: 0 },
-        manpower: { points: 0, income: 0, cap: 0 },
-        fuel: { points: 0, income: 0, cap: 0 },
-        airpower: { points: 0, income: 0, cap: 0 },
-      },
-    },
-    hexagons,
-    landmarks: { city: [], oilfield: [], supply: [] },
-    labels: [],
-    time: { day: 1, month: 1, year: 2025, increment: 1, seasons: {} },
-    turn: { duration: 1000 },
-    unit_types: {},
-    units: [],
-    unit_icons: {},
-  };
-}
-
-export type LayerId =
-  | "image"
-  | "terrain"
-  | "faction"
-  | "rivers"
-  | "railway"
-  | "ports"
-  | "objective_player"
-  | "objective_enemy"
-  | "landmarks"
-  | "labels"
-  | "units";
-
-export const LAYERS: { id: LayerId; label: string }[] = [
-  { id: "image", label: "Image (reference)" },
-  { id: "terrain", label: "Terrain" },
-  { id: "faction", label: "Factions" },
-  { id: "rivers", label: "Rivers" },
-  { id: "railway", label: "Logistics" },
-  { id: "ports", label: "Ports" },
-  { id: "objective_player", label: "Objective (Faction 0)" },
-  { id: "objective_enemy", label: "Objective (Faction 1)" },
-  { id: "landmarks", label: "Landmarks" },
-  { id: "labels", label: "Labels" },
-  { id: "units", label: "Units" },
-];
-
-export interface LayerSettings {
-  visible: boolean;
-  opacity: number; // 0..1
-}
-
-export interface ReferenceImage {
-  dataUrl: string;
-  // Visibility/opacity for the image layer live in the generic per-layer
-  // settings (same mechanism as every other layer), not here.
-  width: number; // natural pixel width of the uploaded image
-  height: number; // natural pixel height of the uploaded image
-  scaleX: number; // 1 = fitted to map bounds width
-  scaleY: number; // 1 = fitted to map bounds height
 }

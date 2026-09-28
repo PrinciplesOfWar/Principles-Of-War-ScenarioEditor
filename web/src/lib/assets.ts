@@ -1,4 +1,4 @@
-import type { LandmarkType, TerrainType } from "../types/scenario";
+import type { LandmarkType, TerrainType } from "../types/scenarioV2";
 
 // Static art dropped in web/public by design — terrain tiles follow the "<type>_0.png"
 // naming convention (variant 0), landmark icons have no suffix.
