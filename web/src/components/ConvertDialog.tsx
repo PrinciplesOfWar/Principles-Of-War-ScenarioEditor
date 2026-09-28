@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { parseScenarioFromJson } from "../lib/exportImport";
-import { convertV1ToV2 } from "../lib/convertV1ToV2";
+import { convertV1ToV2, parseV1ScenarioJson } from "../lib/convertV1ToV2";
+import { useStore } from "../state/store";
 import type { ScenarioV2 } from "../types/scenarioV2";
 
 type Status = "idle" | "converting" | "done";
 
 export default function ConvertDialog({ onClose }: { onClose: () => void }) {
+  const loadScenario = useStore((s) => s.loadScenario);
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<string[]>([]);
   const [result, setResult] = useState<ScenarioV2 | null>(null);
@@ -20,7 +21,7 @@ export default function ConvertDialog({ onClose }: { onClose: () => void }) {
     setFileName(file.name);
     try {
       const text = await file.text();
-      const v1 = parseScenarioFromJson(text);
+      const v1 = parseV1ScenarioJson(text);
       const converted = await convertV1ToV2(v1);
       setErrors(converted.errors);
       setResult(converted.data);
@@ -30,6 +31,12 @@ export default function ConvertDialog({ onClose }: { onClose: () => void }) {
       setStatus("done");
       e.target.value = "";
     }
+  }
+
+  function handleOpenInEditor() {
+    if (!result) return;
+    loadScenario(result);
+    onClose();
   }
 
   function handleSave() {
@@ -78,9 +85,10 @@ export default function ConvertDialog({ onClose }: { onClose: () => void }) {
               Converted successfully — {result.factions.length} factions, {result.map.hexagons.length}{" "}
               hexagons, {result.unit_types.length} unit types, {result.units.length} units.
             </p>
-            <button className="save" onClick={handleSave}>
-              Save v2 JSON
+            <button className="save" onClick={handleOpenInEditor}>
+              Open in editor
             </button>
+            <button onClick={handleSave}>Save v2 JSON</button>
           </div>
         )}
 

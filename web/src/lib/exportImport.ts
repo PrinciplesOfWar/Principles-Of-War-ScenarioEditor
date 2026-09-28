@@ -1,60 +1,43 @@
 import { md5 } from "js-md5";
-import type { Scenario } from "../types/scenario";
+import type { ScenarioV2 } from "../types/scenarioV2";
 import { pyDumpsSorted } from "./pyJson";
+import { validateScenarioV2 } from "./validateScenarioV2";
 
-export function computeScenarioForExport(scenario: Scenario): Scenario {
-  // Mirrors src/scenario_compile.py: hash is computed while metadata.hash is "" and
-  // metadata.timestamp is still its pre-set value ("") — timestamp is only assigned
-  // to a real epoch value AFTER the hash is taken, so it must be excluded the same way here.
-  // updated_at and version change on every save too, so they are excluded from hashing the same way.
-  const forHashing: Scenario = {
-    ...scenario,
-    metadata: {
-      ...scenario.metadata,
-      hash: "",
-      timestamp: "" as unknown as number,
-      updated_at: "" as unknown as number,
-      version: 0,
-    },
-  };
-  const hash = md5(pyDumpsSorted(forHashing));
+export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
+  const { version: _version, ...withoutVersion } = scenario;
+  const hash = md5(pyDumpsSorted(withoutVersion));
   const now = Math.floor(Date.now() / 1000);
   return {
-    ...scenario,
-    metadata: {
-      ...scenario.metadata,
-      hash,
-      timestamp: now,
-      created_at: scenario.metadata.created_at ?? now,
-      updated_at: now,
-      version: scenario.metadata.version == null ? 0 : scenario.metadata.version + 1,
-    },
+    ...withoutVersion,
+    metadata: { ...scenario.metadata, updated_at: now },
+    version: { hash },
   };
 }
 
-export function exportScenarioToFile(scenario: Scenario): void {
-  const withFilename: Scenario = {
-    ...scenario,
-    metadata: { ...scenario.metadata, filename: `${scenario.metadata.id || "scenario"}.json` },
-  };
-  const final = computeScenarioForExport(withFilename);
+export function exportScenarioToFile(scenario: ScenarioV2): void {
+  const final = computeScenarioForExport(scenario);
   const blob = new Blob([JSON.stringify(final, null, 2)], {
     type: "application/json",
   });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = final.metadata.filename;
+  a.download = `${final.metadata.id || "scenario"}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
 }
 
-export function parseScenarioFromJson(text: string): Scenario {
+export function parseScenarioFromJson(text: string): ScenarioV2 {
   const data = JSON.parse(text);
-  if (!data.metadata || !data.hexagons || !data.unit_types) {
+  if (!data.metadata || !data.map || !data.factions || !data.unit_types || !data.units || !data.unit_icons) {
     throw new Error("Invalid scenario JSON: missing required top-level keys");
   }
-  return data as Scenario;
+  const scenario = data as ScenarioV2;
+  const errors = validateScenarioV2(scenario);
+  if (errors.length > 0) {
+    throw new Error(`Invalid scenario JSON:\n${errors.join("\n")}`);
+  }
+  return scenario;
 }

@@ -1,7 +1,8 @@
-import { md5 } from "js-md5";
 import type { Scenario } from "../types/scenario";
 import type { HexagonV2, LandmarkV2, ScenarioV2, UnitTypeV2, UnitV2, FactionV2 } from "../types/scenarioV2";
-import { pyDumpsSorted } from "./pyJson";
+import { contentHash } from "./contentHash";
+import { computeScenarioForExport } from "./exportImport";
+import { validateScenarioV2 } from "./validateScenarioV2";
 
 export interface ConvertResult {
   success: boolean;
@@ -9,19 +10,12 @@ export interface ConvertResult {
   errors: string[];
 }
 
-function base64ToBytes(base64: string): Uint8Array {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
-
-async function contentHash(base64: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", base64ToBytes(base64) as BufferSource);
-  const hex = Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return hex.slice(0, 16);
+export function parseV1ScenarioJson(text: string): Scenario {
+  const data = JSON.parse(text);
+  if (!data.metadata || !data.hexagons || !data.unit_types) {
+    throw new Error("Invalid v1 scenario JSON: missing required top-level keys");
+  }
+  return data as Scenario;
 }
 
 export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
@@ -45,14 +39,12 @@ export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
     };
   });
 
-  function resolveFaction(name: string, context: string): string {
+  // Unresolvable references are passed through as-is rather than erroring here —
+  // validateScenarioV2 (run below, on the fully-built candidate) reports every dangling
+  // faction/unit-type/icon reference in one place instead of duplicating those checks.
+  function resolveFaction(name: string): string {
     if (name === "neutral") return "neutral";
-    const id = factionNameToId.get(name);
-    if (!id) {
-      errors.push(`${context}: references unknown faction "${name}"`);
-      return name;
-    }
-    return id;
+    return factionNameToId.get(name) ?? name;
   }
 
   // --- unit_icons (content-hash rekeying, with dedup) ---
@@ -69,26 +61,20 @@ export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
   const unitTypeKeyToId = new Map<string, string>();
   for (const [key] of unitTypeEntries) unitTypeKeyToId.set(key, crypto.randomUUID());
 
-  const unit_types: UnitTypeV2[] = unitTypeEntries.map(([key, t]) => {
-    const iconHash = iconKeyToHash.get(t.icon);
-    if (!iconHash) {
-      errors.push(`Unit type "${t.name}" (${key}): icon "${t.icon}" not found in unit_icons`);
-    }
-    return {
-      id: unitTypeKeyToId.get(key)!,
-      name: t.name,
-      description: t.description,
-      faction: resolveFaction(t.faction, `Unit type "${t.name}"`),
-      branch: t.branch,
-      icon: iconHash ?? t.icon,
-      attack: t.attack,
-      defense: t.defense,
-      movement: t.movement,
-      cost: t.cost,
-      fuel_consumption: t.fuel_consumption,
-      frequency: t.frequency,
-    };
-  });
+  const unit_types: UnitTypeV2[] = unitTypeEntries.map(([key, t]) => ({
+    id: unitTypeKeyToId.get(key)!,
+    name: t.name,
+    description: t.description,
+    faction: resolveFaction(t.faction),
+    branch: t.branch,
+    icon: iconKeyToHash.get(t.icon) ?? t.icon,
+    attack: t.attack,
+    defense: t.defense,
+    movement: t.movement,
+    cost: t.cost,
+    fuel_consumption: t.fuel_consumption,
+    frequency: t.frequency,
+  }));
 
   // --- landmarks lookup by (x,y), across all three kinds ---
   type LandmarkKind = "city" | "oilfield" | "supply";
@@ -161,7 +147,7 @@ export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
       x: h.x,
       y: h.y,
       terrain: h.terrain,
-      faction: resolveFaction(h.faction, `Hex (${h.x},${h.y})`),
+      faction: resolveFaction(h.faction),
       landmark,
       logistics: h.railway,
       river: [...h.river] as HexagonV2["river"],
@@ -177,26 +163,18 @@ export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
   }
 
   // --- units ---
-  const units: UnitV2[] = (v1.units ?? []).map((u) => {
-    const typeId = unitTypeKeyToId.get(u.type);
-    if (!typeId) errors.push(`Unit at (${u.x},${u.y}): references unknown unit type "${u.type}"`);
-    return {
-      x: u.x,
-      y: u.y,
-      faction: resolveFaction(u.faction, `Unit at (${u.x},${u.y})`),
-      type: typeId ?? u.type,
-      attack: u.attack,
-      defense: u.defense,
-      movement: u.movement,
-    };
-  });
-
-  if (errors.length > 0) {
-    return { success: false, data: null, errors };
-  }
+  const units: UnitV2[] = (v1.units ?? []).map((u) => ({
+    x: u.x,
+    y: u.y,
+    faction: resolveFaction(u.faction),
+    type: unitTypeKeyToId.get(u.type) ?? u.type,
+    attack: u.attack,
+    defense: u.defense,
+    movement: u.movement,
+  }));
 
   const now = Math.floor(Date.now() / 1000);
-  const withoutVersion = {
+  const candidate: ScenarioV2 = {
     metadata: {
       id: crypto.randomUUID(),
       name: v1.metadata.name,
@@ -206,6 +184,7 @@ export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
       created_at: v1.metadata.created_at || now,
       updated_at: now,
     },
+    version: { hash: "" },
     factions,
     map: {
       width: v1.metadata.width,
@@ -220,8 +199,11 @@ export async function convertV1ToV2(v1: Scenario): Promise<ConvertResult> {
     unit_icons: unitIcons,
   };
 
-  const hash = md5(pyDumpsSorted(withoutVersion));
-  const data: ScenarioV2 = { ...withoutVersion, version: { hash } };
+  errors.push(...validateScenarioV2(candidate));
 
-  return { success: true, data, errors: [] };
+  if (errors.length > 0) {
+    return { success: false, data: null, errors };
+  }
+
+  return { success: true, data: computeScenarioForExport(candidate), errors: [] };
 }
