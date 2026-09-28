@@ -1,48 +1,41 @@
 import { useState } from "react";
 import { useStore } from "../../state/store";
-import { orderedFactionNames, UNIT_BRANCHES } from "../../types/scenario";
+import { UNIT_BRANCHES } from "../../types/scenarioV2";
 import IconUploader from "./IconUploader";
 
 export default function UnitTypesEditor() {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
-  const factionNames = orderedFactionNames(scenario.factions);
-  const allIds = Object.keys(scenario.unit_types);
+  const factions = scenario.factions;
 
   const [selectedFaction, setSelectedFaction] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const faction = selectedFaction && factionNames.includes(selectedFaction)
-    ? selectedFaction
-    : factionNames[0];
+  const faction =
+    selectedFaction && factions.some((f) => f.id === selectedFaction) ? selectedFaction : factions[0]?.id;
 
-  const ids = allIds.filter((id) => scenario.unit_types[id].faction === faction);
-  const id = selectedId && ids.includes(selectedId) ? selectedId : ids[0];
-  const t = id ? scenario.unit_types[id] : undefined;
+  const types = scenario.unit_types.filter((t) => t.faction === faction);
+  const id = selectedId && types.some((t) => t.id === selectedId) ? selectedId : types[0]?.id;
+  const t = id ? types.find((tt) => tt.id === id) : undefined;
 
   function addUnitType() {
     if (!faction) return;
-    let n = allIds.length;
-    let newId = `unit_type_${n}`;
-    while (scenario.unit_types[newId]) {
-      n += 1;
-      newId = `unit_type_${n}`;
-    }
+    const newId = crypto.randomUUID();
     update((s) => {
-      s.unit_types[newId] = {
+      s.unit_types.push({
         id: newId,
-        name: newId,
+        name: "New unit type",
         description: "",
         faction,
         branch: "infantry",
-        icon: "unknown",
+        icon: "",
         attack: 1,
         defense: 1,
         movement: 1,
         cost: 1,
         fuel_consumption: 0,
         frequency: 1,
-      };
+      });
       return s;
     });
     setSelectedId(newId);
@@ -50,36 +43,11 @@ export default function UnitTypesEditor() {
 
   function removeUnitType(removeId: string) {
     update((s) => {
-      delete s.unit_types[removeId];
+      s.unit_types = s.unit_types.filter((tt) => tt.id !== removeId);
       s.units = s.units.filter((u) => u.type !== removeId);
       return s;
     });
     setSelectedId(null);
-  }
-
-  function commitUnitTypeName(currentId: string, rawName: string) {
-    const name = rawName.trim();
-    const newId = name.toLowerCase().replace(/ /g, "_");
-    if (!name || newId === currentId) {
-      update((s) => {
-        if (name) s.unit_types[currentId].name = name;
-        return s;
-      });
-      return;
-    }
-    if (scenario.unit_types[newId]) return; // avoid collision, keep old id
-    update((s) => {
-      const def = s.unit_types[currentId];
-      delete s.unit_types[currentId];
-      def.name = name;
-      def.id = newId;
-      s.unit_types[newId] = def;
-      s.units.forEach((u) => {
-        if (u.type === currentId) u.type = newId;
-      });
-      return s;
-    });
-    setSelectedId(newId);
   }
 
   return (
@@ -93,21 +61,17 @@ export default function UnitTypesEditor() {
           setSelectedId(null);
         }}
       >
-        {factionNames.map((f) => (
-          <option key={f} value={f}>
-            {f}
+        {factions.map((f) => (
+          <option key={f.id} value={f.id}>
+            {f.name}
           </option>
         ))}
       </select>
-      {ids.length > 0 && (
-        <select
-          className="tab-select"
-          value={id ?? ""}
-          onChange={(e) => setSelectedId(e.target.value)}
-        >
-          {ids.map((uid) => (
-            <option key={uid} value={uid}>
-              {scenario.unit_types[uid].name}
+      {types.length > 0 && (
+        <select className="tab-select" value={id ?? ""} onChange={(e) => setSelectedId(e.target.value)}>
+          {types.map((ut) => (
+            <option key={ut.id} value={ut.id}>
+              {ut.name}
             </option>
           ))}
         </select>
@@ -121,20 +85,30 @@ export default function UnitTypesEditor() {
             onChange={(e) => {
               const name = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
               update((s) => {
-                s.unit_types[id].name = name;
+                const ut = s.unit_types.find((tt) => tt.id === id);
+                if (ut) ut.name = name;
                 return s;
               });
             }}
-            onBlur={(e) => commitUnitTypeName(id, e.target.value)}
+            onBlur={(e) => {
+              const name = e.target.value.trim();
+              if (!name) return;
+              update((s) => {
+                const ut = s.unit_types.find((tt) => tt.id === id);
+                if (ut) ut.name = name;
+                return s;
+              });
+            }}
           />
-          <label>ID (auto-generated)</label>
+          <label>ID</label>
           <input value={t.id} readOnly disabled />
           <label>Description</label>
           <input
             value={t.description}
             onChange={(e) =>
               update((s) => {
-                s.unit_types[id].description = e.target.value;
+                const ut = s.unit_types.find((tt) => tt.id === id);
+                if (ut) ut.description = e.target.value;
                 return s;
               })
             }
@@ -144,7 +118,8 @@ export default function UnitTypesEditor() {
             value={t.branch}
             onChange={(e) =>
               update((s) => {
-                s.unit_types[id].branch = e.target.value as typeof t.branch;
+                const ut = s.unit_types.find((tt) => tt.id === id);
+                if (ut) ut.branch = e.target.value as typeof t.branch;
                 return s;
               })
             }
@@ -166,7 +141,8 @@ export default function UnitTypesEditor() {
                   value={t[field]}
                   onChange={(e) =>
                     update((s) => {
-                      s.unit_types[id][field] = Number(e.target.value);
+                      const ut = s.unit_types.find((tt) => tt.id === id);
+                      if (ut) ut[field] = Number(e.target.value);
                       return s;
                     })
                   }
@@ -174,13 +150,13 @@ export default function UnitTypesEditor() {
               </div>
             ))}
 
-          <label>Icon filename</label>
-          <input value={t.icon} readOnly disabled />
+          <label>Icon</label>
           <IconUploader
             iconKey={t.icon}
             onIconKeyChange={(key) =>
               update((s) => {
-                s.unit_types[id].icon = key;
+                const ut = s.unit_types.find((tt) => tt.id === id);
+                if (ut) ut.icon = key;
                 return s;
               })
             }

@@ -1,5 +1,4 @@
 import { useStore } from "../../state/store";
-import { orderedFactionNames } from "../../types/scenario";
 
 export default function UnitPanel() {
   const selectedHex = useStore((s) => s.selectedHex);
@@ -11,21 +10,20 @@ export default function UnitPanel() {
 
   const { x, y } = selectedHex;
   const unitsHere = scenario.units.filter((u) => u.x === x && u.y === y);
-  const unitTypeIds = Object.keys(scenario.unit_types);
-  const factionNames = orderedFactionNames(scenario.factions);
+  const unitTypes = scenario.unit_types;
+  const factions = scenario.factions;
 
   function addUnit() {
-    const firstType = unitTypeIds[0];
-    const def = firstType ? scenario.unit_types[firstType] : undefined;
+    const firstType = unitTypes[0];
     update((s) => {
       s.units.push({
         x,
         y,
-        faction: def?.faction ?? factionNames[0] ?? "neutral",
-        type: firstType ?? "",
-        attack: def?.attack ?? 0,
-        defense: def?.defense ?? 0,
-        movement: def?.movement ?? 0,
+        faction: firstType?.faction ?? factions[0]?.id ?? "neutral",
+        type: firstType?.id ?? "",
+        attack: firstType?.attack ?? 0,
+        defense: firstType?.defense ?? 0,
+        movement: firstType?.movement ?? 0,
       });
       return s;
     });
@@ -60,9 +58,9 @@ export default function UnitPanel() {
               })
             }
           >
-            {factionNames.map((f) => (
-              <option key={f} value={f}>
-                {f}
+            {factions.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
               </option>
             ))}
           </select>
@@ -71,7 +69,7 @@ export default function UnitPanel() {
             onChange={(e) =>
               update((s) => {
                 const list = s.units.filter((uu) => uu.x === x && uu.y === y);
-                const t = s.unit_types[e.target.value];
+                const t = s.unit_types.find((tt) => tt.id === e.target.value);
                 list[idx].type = e.target.value;
                 if (t) {
                   list[idx].attack = t.attack;
@@ -83,9 +81,9 @@ export default function UnitPanel() {
             }
           >
             <option value="">(none)</option>
-            {unitTypeIds.map((id) => (
-              <option key={id} value={id}>
-                {scenario.unit_types[id].name}
+            {unitTypes.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
               </option>
             ))}
           </select>
@@ -128,7 +126,7 @@ export default function UnitPanel() {
           <button onClick={() => removeUnit(idx)}>Remove</button>
         </div>
       ))}
-      <button onClick={addUnit} disabled={unitTypeIds.length === 0 && factionNames.length === 0}>
+      <button onClick={addUnit} disabled={unitTypes.length === 0 && factions.length === 0}>
         Add unit
       </button>
     </div>

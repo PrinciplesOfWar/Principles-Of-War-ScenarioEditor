@@ -3,41 +3,28 @@ import { useStore } from "../../state/store";
 import { onAssetLoaded } from "../../lib/assets";
 import { closestEdge, closestLabelSlot, hexToPixel, pixelToHex } from "../../lib/hexGrid";
 import { drawScenario } from "./hexRenderer";
-import type { Hexagon, Scenario } from "../../types/scenario";
+import type { HexagonV2 } from "../../types/scenarioV2";
 
-function landmarkTooltipContent(scenario: Scenario, hex: Hexagon) {
-  if (hex.landmark === "city") {
-    const c = scenario.landmarks.city.find((l) => l.x === hex.x && l.y === hex.y);
-    if (!c) return null;
+function landmarkTooltipContent(hex: HexagonV2) {
+  const landmark = hex.landmark;
+  if (!landmark) return null;
+  if (landmark.type === "city") {
     return (
       <>
-        <strong>{c.name}</strong>
-        <div>Faction: {c.faction}</div>
-        <div>Population: {c.population}</div>
+        <strong>{landmark.name || "(unnamed city)"}</strong>
+        <div>Population: {landmark.population}</div>
       </>
     );
   }
-  if (hex.landmark === "oilfield") {
-    const o = scenario.landmarks.oilfield.find((l) => l.x === hex.x && l.y === hex.y);
-    if (!o) return null;
+  if (landmark.type === "oilfield") {
     return (
       <>
         <strong>Oilfield</strong>
-        <div>Production: {o.production}</div>
+        <div>Production: {landmark.production}</div>
       </>
     );
   }
-  if (hex.landmark === "supply") {
-    const s = scenario.landmarks.supply.find((l) => l.x === hex.x && l.y === hex.y);
-    if (!s) return null;
-    return (
-      <>
-        <strong>Supply</strong>
-        <div>Faction: {s.faction}</div>
-      </>
-    );
-  }
-  return null;
+  return <strong>Supply</strong>;
 }
 
 export default function HexCanvas() {
@@ -50,7 +37,7 @@ export default function HexCanvas() {
   const paintTerrain = useStore((s) => s.paintTerrain);
   const paintFaction = useStore((s) => s.paintFaction);
   const activeFaction = useStore((s) => s.activeFaction);
-  const toggleRailway = useStore((s) => s.toggleRailway);
+  const toggleLogistics = useStore((s) => s.toggleLogistics);
   const togglePort = useStore((s) => s.togglePort);
   const toggleRiverEdge = useStore((s) => s.toggleRiverEdge);
   const toggleObjective = useStore((s) => s.toggleObjective);
@@ -146,7 +133,7 @@ export default function HexCanvas() {
     if (isPanning) return;
     const { x: wx, y: wy } = toWorld(e.clientX, e.clientY);
     const { x, y } = pixelToHex(wx, wy);
-    const hex = scenario.hexagons.find((h) => h.x === x && h.y === y);
+    const hex = scenario.map.hexagons.find((h) => h.x === x && h.y === y);
     if (!hex) return;
     selectHex(x, y);
 
@@ -161,7 +148,7 @@ export default function HexCanvas() {
         paintFaction(x, y, activeFaction);
         break;
       case "railway":
-        toggleRailway(x, y);
+        toggleLogistics(x, y);
         break;
       case "ports":
         togglePort(x, y);
@@ -173,10 +160,10 @@ export default function HexCanvas() {
         break;
       }
       case "objective_player":
-        toggleObjective(x, y, "faction_0");
+        toggleObjective(x, y, "player");
         break;
       case "objective_enemy":
-        toggleObjective(x, y, "faction_1");
+        toggleObjective(x, y, "enemy");
         break;
       case "labels": {
         const { px, py } = hexToPixel(x, y);
@@ -188,7 +175,7 @@ export default function HexCanvas() {
         // A hex that already has a landmark is just selected (its data shows in the
         // sidebar) rather than mutated, so clicking it again never deletes it. Pick
         // "none" as the active type and click a landmark to remove it instead.
-        if (hex.landmark !== activeLandmark) {
+        if ((hex.landmark?.type ?? "default") !== activeLandmark) {
           setLandmark(x, y, activeLandmark);
         }
         break;
@@ -227,8 +214,8 @@ export default function HexCanvas() {
     const rect = canvasRef.current!.getBoundingClientRect();
     const { x: wx, y: wy } = toWorld(e.clientX, e.clientY);
     const { x, y } = pixelToHex(wx, wy);
-    const hex = scenario.hexagons.find((h) => h.x === x && h.y === y);
-    if (hex && hex.landmark !== "default") {
+    const hex = scenario.map.hexagons.find((h) => h.x === x && h.y === y);
+    if (hex && hex.landmark) {
       setHoverHex({ x, y, screenX: e.clientX - rect.left, screenY: e.clientY - rect.top });
     } else {
       setHoverHex(null);
@@ -241,9 +228,9 @@ export default function HexCanvas() {
 
   const hoverTooltip = (() => {
     if (!hoverHex) return null;
-    const hex = scenario.hexagons.find((h) => h.x === hoverHex.x && h.y === hoverHex.y);
+    const hex = scenario.map.hexagons.find((h) => h.x === hoverHex.x && h.y === hoverHex.y);
     if (!hex) return null;
-    return landmarkTooltipContent(scenario, hex);
+    return landmarkTooltipContent(hex);
   })();
 
   return (

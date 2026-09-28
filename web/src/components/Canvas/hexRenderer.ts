@@ -7,14 +7,8 @@ import {
   hexWidth,
   neighborOffset,
 } from "../../lib/hexGrid";
-import {
-  orderedFactionNames,
-  type Hexagon,
-  type LabelEntry,
-  type LayerId,
-  type LayerSettings,
-  type Scenario,
-} from "../../types/scenario";
+import type { LayerId, LayerSettings } from "../../types/app";
+import type { HexagonV2, LabelEntry, ScenarioV2 } from "../../types/scenarioV2";
 
 const TERRAIN_COLORS: Record<string, string> = {
   grass: "#6fa84b",
@@ -26,13 +20,13 @@ const TERRAIN_COLORS: Record<string, string> = {
   water: "#3b6ea5",
 };
 
-// Colors are assigned by each faction's position in scenario.factions, not by name,
-// so renamed or legacy (e.g. old "red"/"blue") faction names still get distinct colors.
+// Colors are assigned by each faction's position in scenario.factions (a real array now,
+// so this order is stable across renames without any extra bookkeeping).
 const FACTION_PALETTE = ["#c82828", "#285ac8", "#2f9e44", "#e8a400", "#9632c8", "#00838f"];
 
-function factionColor(scenario: Scenario, faction: string): string {
-  if (faction === "neutral") return "transparent";
-  const idx = orderedFactionNames(scenario.factions).indexOf(faction);
+function factionColor(scenario: ScenarioV2, factionId: string): string {
+  if (factionId === "neutral") return "transparent";
+  const idx = scenario.factions.findIndex((f) => f.id === factionId);
   return FACTION_PALETTE[idx % FACTION_PALETTE.length] ?? "#888";
 }
 
@@ -42,7 +36,7 @@ function layerAlpha(settings: Record<LayerId, LayerSettings> | undefined, id: La
   return s.opacity;
 }
 
-export function computeMapPixelBounds(scenario: Scenario): {
+export function computeMapPixelBounds(scenario: ScenarioV2): {
   minX: number;
   minY: number;
   maxX: number;
@@ -52,7 +46,7 @@ export function computeMapPixelBounds(scenario: Scenario): {
   let minY = Infinity;
   let maxX = -Infinity;
   let maxY = -Infinity;
-  for (const hex of scenario.hexagons) {
+  for (const hex of scenario.map.hexagons) {
     const { px, py } = hexToPixel(hex.x, hex.y);
     for (const [cx, cy] of hexCorners(px, py)) {
       minX = Math.min(minX, cx);
@@ -66,7 +60,7 @@ export function computeMapPixelBounds(scenario: Scenario): {
 
 export function drawScenario(
   ctx: CanvasRenderingContext2D,
-  scenario: Scenario,
+  scenario: ScenarioV2,
   activeLayer: LayerId,
   _selected: { x: number; y: number } | null,
   layerSettings: Record<LayerId, LayerSettings>,
@@ -79,7 +73,7 @@ export function drawScenario(
   const { width, height } = ctx.canvas;
   ctx.clearRect(0, 0, width, height);
 
-  for (const hex of scenario.hexagons) {
+  for (const hex of scenario.map.hexagons) {
     drawHex(ctx, hex, scenario, activeLayer, layerSettings);
   }
 
@@ -102,7 +96,7 @@ export function drawScenario(
   if (riverAlpha !== null) {
     ctx.save();
     ctx.globalAlpha = riverAlpha;
-    for (const hex of scenario.hexagons) {
+    for (const hex of scenario.map.hexagons) {
       drawRiverEdges(ctx, hex);
     }
     ctx.restore();
@@ -114,25 +108,25 @@ export function drawScenario(
   if (labelsAlpha !== null) {
     ctx.save();
     ctx.globalAlpha = labelsAlpha;
-    drawLabels(ctx, scenario.labels);
+    drawLabels(ctx, scenario.map.labels);
     ctx.restore();
   }
 
   // Logistics (railway) network is drawn as hub-and-spoke lines between the centers
-  // of adjacent railway hexes, so a hex naturally reads as a dead end, a through-line,
-  // a turn, or a hub depending on how many of its neighbors also have railway.
+  // of adjacent logistics hexes, so a hex naturally reads as a dead end, a through-line,
+  // a turn, or a hub depending on how many of its neighbors also have logistics.
   const railwayAlpha = layerAlpha(layerSettings, "railway");
   if (railwayAlpha !== null) {
     ctx.save();
     ctx.globalAlpha = railwayAlpha;
-    for (const hex of scenario.hexagons) {
-      if (hex.railway) drawRailwayNode(ctx, scenario, hex);
+    for (const hex of scenario.map.hexagons) {
+      if (hex.logistics) drawRailwayNode(ctx, scenario, hex);
     }
     ctx.restore();
   }
 }
 
-function drawRiverEdges(ctx: CanvasRenderingContext2D, hex: Hexagon) {
+function drawRiverEdges(ctx: CanvasRenderingContext2D, hex: HexagonV2) {
   const { px, py } = hexToPixel(hex.x, hex.y);
   const corners = hexCorners(px, py);
   for (let edge = 0; edge < 6; edge++) {
@@ -169,11 +163,11 @@ function drawLabels(ctx: CanvasRenderingContext2D, labels: LabelEntry[]) {
   ctx.textBaseline = "alphabetic";
 }
 
-function findHex(scenario: Scenario, x: number, y: number): Hexagon | undefined {
-  return scenario.hexagons.find((h) => h.x === x && h.y === y);
+function findHex(scenario: ScenarioV2, x: number, y: number): HexagonV2 | undefined {
+  return scenario.map.hexagons.find((h) => h.x === x && h.y === y);
 }
 
-function drawRailwayNode(ctx: CanvasRenderingContext2D, scenario: Scenario, hex: Hexagon) {
+function drawRailwayNode(ctx: CanvasRenderingContext2D, scenario: ScenarioV2, hex: HexagonV2) {
   const { px, py } = hexToPixel(hex.x, hex.y);
 
   ctx.strokeStyle = "#111";
@@ -184,7 +178,7 @@ function drawRailwayNode(ctx: CanvasRenderingContext2D, scenario: Scenario, hex:
   for (let edge = 0; edge < 6; edge++) {
     const n = neighborOffset(hex.x, hex.y, edge);
     const neighbor = findHex(scenario, n.x, n.y);
-    if (!neighbor?.railway) continue;
+    if (!neighbor?.logistics) continue;
     connections++;
     const { px: nx, py: ny } = hexToPixel(n.x, n.y);
     ctx.beginPath();
@@ -195,7 +189,7 @@ function drawRailwayNode(ctx: CanvasRenderingContext2D, scenario: Scenario, hex:
 
   ctx.setLineDash([]);
 
-  // A hex with no connected railway neighbor still gets a marker (isolated node);
+  // A hex with no connected logistics neighbor still gets a marker (isolated node);
   // one with any connections gets a small hub dot at its center (dead end, turn, or hub).
   ctx.beginPath();
   ctx.arc(px, py, connections <= 1 ? 3 : 4, 0, Math.PI * 2);
@@ -205,8 +199,8 @@ function drawRailwayNode(ctx: CanvasRenderingContext2D, scenario: Scenario, hex:
 
 function drawHex(
   ctx: CanvasRenderingContext2D,
-  hex: Hexagon,
-  scenario: Scenario,
+  hex: HexagonV2,
+  scenario: ScenarioV2,
   activeLayer: LayerId,
   layerSettings: Record<LayerId, LayerSettings>
 ) {
@@ -275,16 +269,18 @@ function drawHex(
     ctx.restore();
   }
 
+  const objectivePlayerId = scenario.factions[0]?.id;
   const objectivePlayerAlpha = layerAlpha(layerSettings, "objective_player");
-  if (objectivePlayerAlpha !== null && hex.objective.faction_0) {
+  if (objectivePlayerAlpha !== null && objectivePlayerId && hex.objective.includes(objectivePlayerId)) {
     ctx.save();
     ctx.globalAlpha = objectivePlayerAlpha;
     ctx.fillStyle = "yellow";
     ctx.fill();
     ctx.restore();
   }
+  const objectiveEnemyId = scenario.factions[1]?.id;
   const objectiveEnemyAlpha = layerAlpha(layerSettings, "objective_enemy");
-  if (objectiveEnemyAlpha !== null && hex.objective.faction_1) {
+  if (objectiveEnemyAlpha !== null && objectiveEnemyId && hex.objective.includes(objectiveEnemyId)) {
     ctx.save();
     ctx.globalAlpha = objectiveEnemyAlpha;
     ctx.fillStyle = "yellow";
@@ -293,10 +289,10 @@ function drawHex(
   }
 
   const landmarkAlpha = layerAlpha(layerSettings, "landmarks");
-  if (landmarkAlpha !== null && hex.landmark !== "default") {
+  if (landmarkAlpha !== null && hex.landmark) {
     ctx.save();
     ctx.globalAlpha = landmarkAlpha;
-    const landmarkImg = getLandmarkImage(hex.landmark);
+    const landmarkImg = getLandmarkImage(hex.landmark.type);
     if (isImageReady(landmarkImg)) {
       const w = hexWidth();
       const h = hexHeight();
@@ -311,7 +307,7 @@ function drawHex(
       ctx.fillStyle = "#333";
       ctx.font = "9px sans-serif";
       ctx.textAlign = "center";
-      const label = hex.landmark === "city" ? "C" : hex.landmark === "oilfield" ? "O" : "S";
+      const label = hex.landmark.type === "city" ? "C" : hex.landmark.type === "oilfield" ? "O" : "S";
       ctx.fillText(label, px, py + 3);
       ctx.textAlign = "left";
     }

@@ -1,5 +1,5 @@
 import { useStore } from "../../state/store";
-import { LABEL_TYPES, LANDMARK_TYPES, orderedFactionNames, TERRAIN_TYPES } from "../../types/scenario";
+import { LABEL_TYPES, LANDMARK_TYPES, TERRAIN_TYPES } from "../../types/scenarioV2";
 
 export default function ToolPanel() {
   const activeLayer = useStore((s) => s.activeLayer);
@@ -15,7 +15,7 @@ export default function ToolPanel() {
   const scenario = useStore((s) => s.scenario);
   const selectedHex = useStore((s) => s.selectedHex);
 
-  const factionNames = ["neutral", ...orderedFactionNames(scenario.factions)];
+  const factions = scenario.factions;
 
   return (
     <div className="panel">
@@ -44,13 +44,19 @@ export default function ToolPanel() {
         <>
           <label>Faction (front-line ownership)</label>
           <div className="swatches">
-            {factionNames.map((f) => (
+            <button
+              className={activeFaction === "neutral" ? "active" : ""}
+              onClick={() => setActiveFaction("neutral")}
+            >
+              neutral
+            </button>
+            {factions.map((f) => (
               <button
-                key={f}
-                className={activeFaction === f ? "active" : ""}
-                onClick={() => setActiveFaction(f)}
+                key={f.id}
+                className={activeFaction === f.id ? "active" : ""}
+                onClick={() => setActiveFaction(f.id)}
               >
-                {f}
+                {f.name}
               </button>
             ))}
           </div>
@@ -62,14 +68,17 @@ export default function ToolPanel() {
         <p className="hint">Click near a hex edge to toggle a river segment on that edge.</p>
       )}
 
-      {activeLayer === "railway" && <p className="hint">Click a hex to toggle railway.</p>}
+      {activeLayer === "railway" && <p className="hint">Click a hex to toggle logistics.</p>}
 
       {activeLayer === "ports" && <p className="hint">Click a hex to toggle a port.</p>}
 
       {(activeLayer === "objective_player" || activeLayer === "objective_enemy") && (
         <p className="hint">
           Click a hex to toggle the objective flag for{" "}
-          {activeLayer === "objective_player" ? "faction_0" : "faction_1"}.
+          {activeLayer === "objective_player"
+            ? factions[0]?.name ?? "the 1st faction"
+            : factions[1]?.name ?? "the 2nd faction"}
+          .
         </p>
       )}
 
@@ -221,51 +230,32 @@ function ImageLayerControls() {
 function LandmarkDetail({ x, y }: { x: number; y: number }) {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
-  const hex = scenario.hexagons.find((h) => h.x === x && h.y === y);
-  const factionNames = ["neutral", ...orderedFactionNames(scenario.factions)];
-  if (!hex || hex.landmark === "default") return null;
+  const hex = scenario.map.hexagons.find((h) => h.x === x && h.y === y);
+  if (!hex || !hex.landmark) return null;
+  const landmark = hex.landmark;
 
-  if (hex.landmark === "city") {
-    const entry = scenario.landmarks.city.find((c) => c.x === x && c.y === y);
-    if (!entry) return null;
+  if (landmark.type === "city") {
     return (
       <div className="detail-form">
         <label>Name</label>
         <input
-          value={entry.name}
+          value={landmark.name}
           onChange={(e) =>
             update((s) => {
-              const c = s.landmarks.city.find((cc) => cc.x === x && cc.y === y);
-              if (c) c.name = e.target.value;
+              const h = s.map.hexagons.find((hh) => hh.x === x && hh.y === y);
+              if (h && h.landmark?.type === "city") h.landmark.name = e.target.value;
               return s;
             })
           }
         />
-        <label>Faction</label>
-        <select
-          value={entry.faction}
-          onChange={(e) =>
-            update((s) => {
-              const c = s.landmarks.city.find((cc) => cc.x === x && cc.y === y);
-              if (c) c.faction = e.target.value;
-              return s;
-            })
-          }
-        >
-          {factionNames.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
-        </select>
         <label>Population</label>
         <input
           type="number"
-          value={entry.population}
+          value={landmark.population}
           onChange={(e) =>
             update((s) => {
-              const c = s.landmarks.city.find((cc) => cc.x === x && cc.y === y);
-              if (c) c.population = Number(e.target.value);
+              const h = s.map.hexagons.find((hh) => hh.x === x && hh.y === y);
+              if (h && h.landmark?.type === "city") h.landmark.population = Number(e.target.value);
               return s;
             })
           }
@@ -274,19 +264,17 @@ function LandmarkDetail({ x, y }: { x: number; y: number }) {
     );
   }
 
-  if (hex.landmark === "oilfield") {
-    const entry = scenario.landmarks.oilfield.find((c) => c.x === x && c.y === y);
-    if (!entry) return null;
+  if (landmark.type === "oilfield") {
     return (
       <div className="detail-form">
         <label>Production</label>
         <input
           type="number"
-          value={entry.production}
+          value={landmark.production}
           onChange={(e) =>
             update((s) => {
-              const o = s.landmarks.oilfield.find((oo) => oo.x === x && oo.y === y);
-              if (o) o.production = Number(e.target.value);
+              const h = s.map.hexagons.find((hh) => hh.x === x && hh.y === y);
+              if (h && h.landmark?.type === "oilfield") h.landmark.production = Number(e.target.value);
               return s;
             })
           }
@@ -295,40 +283,14 @@ function LandmarkDetail({ x, y }: { x: number; y: number }) {
     );
   }
 
-  if (hex.landmark === "supply") {
-    const entry = scenario.landmarks.supply.find((c) => c.x === x && c.y === y);
-    if (!entry) return null;
-    return (
-      <div className="detail-form">
-        <label>Faction</label>
-        <select
-          value={entry.faction}
-          onChange={(e) =>
-            update((s) => {
-              const sup = s.landmarks.supply.find((ss) => ss.x === x && ss.y === y);
-              if (sup) sup.faction = e.target.value;
-              return s;
-            })
-          }
-        >
-          {factionNames.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  }
-
-  return null;
+  return <p className="hint">Supply point — no additional fields.</p>;
 }
 
 function LabelDetail({ x, y, edge }: { x: number; y: number; edge: number | null }) {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
   const removeLabel = useStore((s) => s.removeLabel);
-  const entry = scenario.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
+  const entry = scenario.map.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
   if (!entry) return null;
 
   return (
@@ -341,7 +303,7 @@ function LabelDetail({ x, y, edge }: { x: number; y: number; edge: number | null
             value={entry.name}
             onChange={(e) =>
               update((s) => {
-                const l = s.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
+                const l = s.map.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
                 if (l) l.name = e.target.value;
                 return s;
               })

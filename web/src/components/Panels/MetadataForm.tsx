@@ -16,24 +16,18 @@ export default function MetadataForm() {
       <label>Name</label>
       <input
         value={m.name}
-        onChange={(e) => {
-          const name = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
-          const id = name.toLowerCase().replace(/ /g, "_");
+        onChange={(e) =>
           update((s) => {
-            s.metadata.name = name;
-            s.metadata.id = id;
+            s.metadata.name = e.target.value;
             return s;
-          });
-        }}
-        onBlur={(e) => {
-          const name = e.target.value.trim();
-          const id = name.toLowerCase().replace(/ /g, "_");
+          })
+        }
+        onBlur={(e) =>
           update((s) => {
-            s.metadata.name = name;
-            s.metadata.id = id;
+            s.metadata.name = e.target.value.trim();
             return s;
-          });
-        }}
+          })
+        }
       />
       <label>Type</label>
       <select
@@ -68,16 +62,14 @@ export default function MetadataForm() {
           })
         }
       />
-      <label>ID (auto-generated)</label>
+      <label>ID</label>
       <input value={m.id} readOnly disabled />
       <label>Created At</label>
       <input value={formatTimestamp(m.created_at)} readOnly disabled />
       <label>Updated At</label>
       <input value={formatTimestamp(m.updated_at)} readOnly disabled />
-      <label>Version</label>
-      <input value={m.version} readOnly disabled />
       <label>Hash</label>
-      <input value={m.hash} readOnly disabled />
+      <input value={scenario.version.hash} readOnly disabled />
     </div>
   );
 }

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useStore } from "../../state/store";
-import { orderedFactionNames } from "../../types/scenario";
-import type { Faction, Factions } from "../../types/scenario";
+import type { FactionV2 } from "../../types/scenarioV2";
 
-function cloneFaction(f: Faction): Faction {
+function cloneFaction(f: FactionV2): FactionV2 {
   return {
     id: f.id,
     name: f.name,
@@ -14,12 +13,10 @@ function cloneFaction(f: Faction): Faction {
   };
 }
 
-function validateName(name: string, currentKey: string, factions: Factions): string | null {
+function validateName(name: string, currentId: string, factions: FactionV2[]): string | null {
   const trimmed = name.trim();
   if (!trimmed) return "Name cannot be empty";
-  const duplicate = Object.keys(factions).some(
-    (k) => k !== currentKey && factions[k].name.trim() === trimmed
-  );
+  const duplicate = factions.some((f) => f.id !== currentId && f.name.trim() === trimmed);
   if (duplicate) return "Name must be unique";
   return null;
 }
@@ -27,47 +24,29 @@ function validateName(name: string, currentKey: string, factions: Factions): str
 export default function FactionsForm() {
   const scenario = useStore((s) => s.scenario);
   const update = useStore((s) => s.update);
-  const names = orderedFactionNames(scenario.factions);
+  const factions = scenario.factions;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const name = names.find((n) => scenario.factions[n].id === selectedId) ?? names[0];
-  const stored = name ? scenario.factions[name] : undefined;
+  const stored = factions.find((f) => f.id === selectedId) ?? factions[0];
 
-  const [draft, setDraft] = useState<Faction | null>(stored ? cloneFaction(stored) : null);
+  const [draft, setDraft] = useState<FactionV2 | null>(stored ? cloneFaction(stored) : null);
 
   useEffect(() => {
     setDraft(stored ? cloneFaction(stored) : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name]);
+  }, [stored?.id]);
 
   const isDirty = !!draft && !!stored && JSON.stringify(draft) !== JSON.stringify(stored);
-  const nameError = draft && name ? validateName(draft.name, name, scenario.factions) : null;
+  const nameError = draft ? validateName(draft.name, draft.id, factions) : null;
 
   const handleSave = () => {
-    if (!draft || !name || nameError) return;
-    const trimmed: Faction = { ...draft, name: draft.name.trim() };
-    const oldName = name;
-    const newName = trimmed.name;
+    if (!draft || nameError) return;
+    // id never changes on rename, so this is a plain field update — no references to it
+    // (hexagons/units/unit_types/etc.) ever need rewriting.
+    const trimmed: FactionV2 = { ...draft, name: draft.name.trim() };
     update((s) => {
-      delete s.factions[oldName];
-      s.factions[newName] = trimmed;
-      if (oldName !== newName) {
-        for (const hex of s.hexagons) {
-          if (hex.faction === oldName) hex.faction = newName;
-        }
-        for (const city of s.landmarks.city) {
-          if (city.faction === oldName) city.faction = newName;
-        }
-        for (const supply of s.landmarks.supply) {
-          if (supply.faction === oldName) supply.faction = newName;
-        }
-        for (const unitType of Object.values(s.unit_types)) {
-          if (unitType.faction === oldName) unitType.faction = newName;
-        }
-        for (const unit of s.units) {
-          if (unit.faction === oldName) unit.faction = newName;
-        }
-      }
+      const f = s.factions.find((ff) => ff.id === trimmed.id);
+      if (f) Object.assign(f, trimmed);
       return s;
     });
     setDraft(trimmed);
@@ -86,13 +65,13 @@ export default function FactionsForm() {
         disabled={isDirty}
         onChange={(e) => setSelectedId(e.target.value)}
       >
-        {names.map((n) => (
-          <option key={scenario.factions[n].id} value={scenario.factions[n].id}>
-            {scenario.factions[n].name}
+        {factions.map((f) => (
+          <option key={f.id} value={f.id}>
+            {f.name}
           </option>
         ))}
       </select>
-      {draft && name && (
+      {draft && (
         <div className="detail-form faction-block">
           <label>Name</label>
           <input
@@ -112,9 +91,7 @@ export default function FactionsForm() {
             type="number"
             value={draft.units.cap}
             onChange={(e) =>
-              setDraft((d) =>
-                d ? { ...d, units: { ...d.units, cap: Number(e.target.value) } } : d
-              )
+              setDraft((d) => (d ? { ...d, units: { ...d.units, cap: Number(e.target.value) } } : d))
             }
           />
           {(["manpower", "fuel", "airpower"] as const).map((res) => (
@@ -125,9 +102,7 @@ export default function FactionsForm() {
                 type="number"
                 value={draft[res].points}
                 onChange={(e) =>
-                  setDraft((d) =>
-                    d ? { ...d, [res]: { ...d[res], points: Number(e.target.value) } } : d
-                  )
+                  setDraft((d) => (d ? { ...d, [res]: { ...d[res], points: Number(e.target.value) } } : d))
                 }
               />
               <label>Income</label>
@@ -135,9 +110,7 @@ export default function FactionsForm() {
                 type="number"
                 value={draft[res].income}
                 onChange={(e) =>
-                  setDraft((d) =>
-                    d ? { ...d, [res]: { ...d[res], income: Number(e.target.value) } } : d
-                  )
+                  setDraft((d) => (d ? { ...d, [res]: { ...d[res], income: Number(e.target.value) } } : d))
                 }
               />
               <label>Cap</label>
@@ -145,9 +118,7 @@ export default function FactionsForm() {
                 type="number"
                 value={draft[res].cap}
                 onChange={(e) =>
-                  setDraft((d) =>
-                    d ? { ...d, [res]: { ...d[res], cap: Number(e.target.value) } } : d
-                  )
+                  setDraft((d) => (d ? { ...d, [res]: { ...d[res], cap: Number(e.target.value) } } : d))
                 }
               />
             </fieldset>

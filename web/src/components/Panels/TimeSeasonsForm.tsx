@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useStore } from "../../state/store";
-import { TERRAIN_TYPES, type TerrainType } from "../../types/scenario";
+import { TERRAIN_TYPES, type TerrainType } from "../../types/scenarioV2";
 
 export default function TimeSeasonsForm() {
   const scenario = useStore((s) => s.scenario);

@@ -1,5 +1,5 @@
 import { useStore } from "../../state/store";
-import { LAYERS } from "../../types/scenario";
+import { LAYERS } from "../../types/app";
 
 export default function LayerPanel() {
   const activeLayer = useStore((s) => s.activeLayer);

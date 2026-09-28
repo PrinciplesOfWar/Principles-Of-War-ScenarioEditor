@@ -1,4 +1,5 @@
 import { useStore } from "../../state/store";
+import { contentHash } from "../../lib/contentHash";
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -32,8 +33,9 @@ export default function IconUploader({
       return;
     }
     const base64 = await fileToBase64(file);
-    const key = file.name;
+    const key = await contentHash(base64);
     update((s) => {
+      // Same bytes -> same key, so uploading an icon that already exists just reuses it.
       s.unit_icons[key] = base64;
       return s;
     });

@@ -1,20 +1,17 @@
 import { create } from "zustand";
 import { neighborOffset, oppositeEdge } from "../lib/hexGrid";
+import { LAYERS, type LayerId, type LayerSettings, type ReferenceImage } from "../types/app";
 import {
-  createEmptyScenario,
-  defaultHexagon,
-  LAYERS,
-  type Hexagon,
+  createEmptyScenarioV2,
+  defaultHexagonV2,
+  type HexagonV2,
   type LabelType,
   type LandmarkType,
-  type LayerId,
-  type LayerSettings,
-  type ReferenceImage,
-  type Scenario,
+  type ScenarioV2,
   type TerrainType,
-} from "../types/scenario";
+} from "../types/scenarioV2";
 
-const STORAGE_KEY = "pow-map-editor-projects";
+const STORAGE_KEY = "pow-map-editor-projects-v2";
 const LAYER_SETTINGS_KEY = "pow-map-editor-layer-settings";
 const MAX_HISTORY = 50;
 
@@ -43,21 +40,21 @@ function persistLayerSettings(settings: Record<LayerId, LayerSettings>) {
 
 export interface Project {
   id: string;
-  scenario: Scenario;
-  past: Scenario[];
-  future: Scenario[];
+  scenario: ScenarioV2;
+  past: ScenarioV2[];
+  future: ScenarioV2[];
   referenceImage: ReferenceImage | null;
 }
 
 interface PersistedShape {
-  projects: { id: string; scenario: Scenario; referenceImage: ReferenceImage | null }[];
+  projects: { id: string; scenario: ScenarioV2; referenceImage: ReferenceImage | null }[];
   activeProjectId: string;
 }
 
 interface StoreState {
   projects: Project[];
   activeProjectId: string;
-  scenario: Scenario;
+  scenario: ScenarioV2;
   referenceImage: ReferenceImage | null;
 
   activeLayer: LayerId;
@@ -79,15 +76,15 @@ interface StoreState {
   setLayerOpacity: (id: LayerId, opacity: number) => void;
 
   switchProject: (id: string) => void;
-  addProject: (scenario?: Scenario) => void;
+  addProject: (scenario?: ScenarioV2) => void;
   closeProject: (id: string) => void;
 
   setReferenceImage: (dataUrl: string, width: number, height: number) => void;
   setReferenceScale: (scaleX: number, scaleY: number) => void;
   clearReferenceImage: () => void;
 
-  update: (mutator: (s: Scenario) => Scenario) => void;
-  loadScenario: (s: Scenario) => void;
+  update: (mutator: (s: ScenarioV2) => ScenarioV2) => void;
+  loadScenario: (s: ScenarioV2) => void;
   newScenario: () => void;
   undo: () => void;
   redo: () => void;
@@ -95,63 +92,21 @@ interface StoreState {
   paintTerrain: (x: number, y: number) => void;
   paintFaction: (x: number, y: number, faction: string) => void;
   togglePort: (x: number, y: number) => void;
-  toggleRailway: (x: number, y: number) => void;
+  toggleLogistics: (x: number, y: number) => void;
   toggleRiverEdge: (x: number, y: number, edge: number) => void;
-  toggleObjective: (x: number, y: number, which: "faction_0" | "faction_1") => void;
+  toggleObjective: (x: number, y: number, which: "player" | "enemy") => void;
   setLandmark: (x: number, y: number, type: LandmarkType) => void;
   placeOrSelectLabel: (x: number, y: number, edge: number | null) => void;
   removeLabel: (x: number, y: number, edge: number | null) => void;
   resizeMap: (width: number, height: number) => void;
 }
 
-function getHex(s: Scenario, x: number, y: number): Hexagon | undefined {
-  return s.hexagons.find((h) => h.x === x && h.y === y);
+function getHex(s: ScenarioV2, x: number, y: number): HexagonV2 | undefined {
+  return s.map.hexagons.find((h) => h.x === x && h.y === y);
 }
 
 function makeId(): string {
   return Math.random().toString(36).slice(2, 10);
-}
-
-// One-time migration: projects saved before the default factions were renamed from
-// "red"/"blue" to "faction 0"/"faction 1" still carry the old names everywhere they're
-// referenced. Rename them in place (by id, not name) so old projects pick up the new
-// naming/coloring automatically instead of looking "stuck" on red/blue.
-function migrateLegacyFactionNames(scenario: Scenario): Scenario {
-  const renames: Record<string, string> = {};
-  for (const [name, faction] of Object.entries(scenario.factions)) {
-    if (faction.id === "faction_0" && name !== "faction 0") renames[name] = "faction 0";
-    if (faction.id === "faction_1" && name !== "faction 1") renames[name] = "faction 1";
-  }
-  if (Object.keys(renames).length === 0) return scenario;
-
-  const next = structuredClone(scenario);
-  for (const [oldName, newName] of Object.entries(renames)) {
-    const faction = next.factions[oldName];
-    delete next.factions[oldName];
-    faction.name = newName;
-    next.factions[newName] = faction;
-  }
-  const renameFaction = (f: string) => renames[f] ?? f;
-  next.hexagons.forEach((h) => (h.faction = renameFaction(h.faction)));
-  next.units.forEach((u) => (u.faction = renameFaction(u.faction)));
-  next.unit_types = Object.fromEntries(
-    Object.entries(next.unit_types).map(([id, t]) => [id, { ...t, faction: renameFaction(t.faction) }])
-  );
-  next.landmarks.city.forEach((l) => (l.faction = renameFaction(l.faction)));
-  next.landmarks.supply.forEach((l) => (l.faction = renameFaction(l.faction)));
-  return next;
-}
-
-// Projects/imports saved before the labels layer existed have no `labels` array at all.
-// Ones saved while the only label type was still called "river" (before it was renamed
-// to the more general "water") carry that old type value and need it remapped.
-function ensureLabels(scenario: Scenario): Scenario {
-  const labels = scenario.labels ?? [];
-  const migrated = labels.map((l) =>
-    (l.type as string) === "river" ? { ...l, type: "water" as const } : l
-  );
-  if (scenario.labels && migrated.every((l, i) => l === labels[i])) return scenario;
-  return { ...scenario, labels: migrated };
 }
 
 function loadFromStorage(): { projects: Project[]; activeProjectId: string } {
@@ -163,7 +118,7 @@ function loadFromStorage(): { projects: Project[]; activeProjectId: string } {
         return {
           projects: parsed.projects.map((p) => ({
             id: p.id,
-            scenario: ensureLabels(migrateLegacyFactionNames(p.scenario)),
+            scenario: p.scenario,
             past: [],
             future: [],
             referenceImage: p.referenceImage ?? null,
@@ -175,7 +130,7 @@ function loadFromStorage(): { projects: Project[]; activeProjectId: string } {
   } catch {
     /* ignore corrupt storage */
   }
-  const scenario = createEmptyScenario();
+  const scenario = createEmptyScenarioV2();
   const id = makeId();
   return { projects: [{ id, scenario, past: [], future: [], referenceImage: null }], activeProjectId: id };
 }
@@ -241,7 +196,7 @@ export const useStore = create<StoreState>((set, get) => ({
     const id = makeId();
     const next: Project = {
       id,
-      scenario: scenario ? ensureLabels(scenario) : createEmptyScenario(),
+      scenario: scenario ?? createEmptyScenarioV2(),
       past: [],
       future: [],
       referenceImage: null,
@@ -370,10 +325,10 @@ export const useStore = create<StoreState>((set, get) => ({
     });
   },
 
-  toggleRailway: (x, y) => {
+  toggleLogistics: (x, y) => {
     get().update((s) => {
       const h = getHex(s, x, y);
-      if (h) h.railway = !h.railway;
+      if (h) h.logistics = !h.logistics;
       return s;
     });
   },
@@ -397,7 +352,12 @@ export const useStore = create<StoreState>((set, get) => ({
   toggleObjective: (x, y, which) => {
     get().update((s) => {
       const h = getHex(s, x, y);
-      if (h) h.objective[which] = !h.objective[which];
+      if (!h) return s;
+      const factionId = s.factions[which === "player" ? 0 : 1]?.id;
+      if (!factionId) return s; // fewer than 2 factions — this layer is inert
+      h.objective = h.objective.includes(factionId)
+        ? h.objective.filter((id) => id !== factionId)
+        : [...h.objective, factionId];
       return s;
     });
   },
@@ -406,32 +366,29 @@ export const useStore = create<StoreState>((set, get) => ({
     get().update((s) => {
       const h = getHex(s, x, y);
       if (!h) return s;
-      h.landmark = type;
-      s.landmarks.city = s.landmarks.city.filter((l) => !(l.x === x && l.y === y));
-      s.landmarks.oilfield = s.landmarks.oilfield.filter((l) => !(l.x === x && l.y === y));
-      s.landmarks.supply = s.landmarks.supply.filter((l) => !(l.x === x && l.y === y));
-      if (type === "city") {
-        s.landmarks.city.push({ x, y, name: "City", faction: "neutral", population: 0 });
-      } else if (type === "oilfield") {
-        s.landmarks.oilfield.push({ x, y, production: 0 });
-      } else if (type === "supply") {
-        s.landmarks.supply.push({ x, y, faction: "neutral" });
-      }
+      h.landmark =
+        type === "city"
+          ? { type: "city", name: "", population: 0 }
+          : type === "oilfield"
+            ? { type: "oilfield", production: 0 }
+            : type === "supply"
+              ? { type: "supply" }
+              : null;
       return s;
     });
   },
 
   placeOrSelectLabel: (x, y, edge) => {
     const { scenario, activeLabelType } = get();
-    const existing = scenario.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
+    const existing = scenario.map.labels.find((l) => l.x === x && l.y === y && l.edge === edge);
     if (!existing) {
       get().update((s) => {
-        s.labels.push({ x, y, edge, type: activeLabelType, name: "" });
+        s.map.labels.push({ x, y, edge, type: activeLabelType, name: "" });
         return s;
       });
     } else if (existing.type !== activeLabelType) {
       get().update((s) => {
-        const l = s.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
+        const l = s.map.labels.find((ll) => ll.x === x && ll.y === y && ll.edge === edge);
         if (l) l.type = activeLabelType;
         return s;
       });
@@ -441,7 +398,7 @@ export const useStore = create<StoreState>((set, get) => ({
 
   removeLabel: (x, y, edge) => {
     get().update((s) => {
-      s.labels = s.labels.filter((l) => !(l.x === x && l.y === y && l.edge === edge));
+      s.map.labels = s.map.labels.filter((l) => !(l.x === x && l.y === y && l.edge === edge));
       return s;
     });
     set({ selectedLabelSlot: null });
@@ -449,22 +406,19 @@ export const useStore = create<StoreState>((set, get) => ({
 
   resizeMap: (width, height) => {
     get().update((s) => {
-      const old = new Map(s.hexagons.map((h) => [`${h.x},${h.y}`, h]));
-      const next: Hexagon[] = [];
+      const old = new Map(s.map.hexagons.map((h) => [`${h.x},${h.y}`, h]));
+      const next: HexagonV2[] = [];
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-          next.push(old.get(`${x},${y}`) ?? defaultHexagon(x, y));
+          next.push(old.get(`${x},${y}`) ?? defaultHexagonV2(x, y));
         }
       }
-      s.hexagons = next;
-      s.metadata.width = width;
-      s.metadata.height = height;
+      s.map.hexagons = next;
+      s.map.width = width;
+      s.map.height = height;
       const inBounds = (x: number, y: number) => x >= 0 && x < width && y >= 0 && y < height;
       s.units = s.units.filter((u) => inBounds(u.x, u.y));
-      s.landmarks.city = s.landmarks.city.filter((l) => inBounds(l.x, l.y));
-      s.landmarks.oilfield = s.landmarks.oilfield.filter((l) => inBounds(l.x, l.y));
-      s.landmarks.supply = s.landmarks.supply.filter((l) => inBounds(l.x, l.y));
-      s.labels = s.labels.filter((l) => inBounds(l.x, l.y));
+      s.map.labels = s.map.labels.filter((l) => inBounds(l.x, l.y));
       return s;
     });
   },

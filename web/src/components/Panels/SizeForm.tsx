@@ -3,7 +3,7 @@ import { useStore } from "../../state/store";
 export default function SizeForm() {
   const scenario = useStore((s) => s.scenario);
   const resizeMap = useStore((s) => s.resizeMap);
-  const m = scenario.metadata;
+  const m = scenario.map;
 
   return (
     <div className="panel">
