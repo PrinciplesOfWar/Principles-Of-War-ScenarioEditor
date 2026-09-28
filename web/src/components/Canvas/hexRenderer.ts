@@ -143,8 +143,10 @@ function drawRiverEdges(ctx: CanvasRenderingContext2D, hex: HexagonV2) {
   }
 }
 
+const LABEL_SCALE = 3; // 300% of the original size
+
 function drawLabels(ctx: CanvasRenderingContext2D, labels: LabelEntry[]) {
-  ctx.font = "10px sans-serif";
+  ctx.font = `${10 * LABEL_SCALE}px sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const label of labels) {
@@ -152,12 +154,12 @@ function drawLabels(ctx: CanvasRenderingContext2D, labels: LabelEntry[]) {
     const { px, py } = hexToPixel(label.x, label.y);
     const [tx, ty] = label.edge === null ? [px, py] : hexEdgeMidpoint(px, py, label.edge);
     const textWidth = ctx.measureText(label.name).width;
-    const w = textWidth + 6;
-    const h = 12;
+    const w = textWidth + 6 * LABEL_SCALE;
+    const h = 12 * LABEL_SCALE;
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(tx - w / 2, ty - h / 2, w, h);
     ctx.fillStyle = "#fff";
-    ctx.fillText(label.name, tx, ty + 1);
+    ctx.fillText(label.name, tx, ty + 1 * LABEL_SCALE);
   }
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
