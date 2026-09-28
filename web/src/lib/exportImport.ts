@@ -5,6 +5,13 @@ import { validateScenarioV2 } from "./validateScenarioV2";
 
 export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
   const { version: _version, ...withoutVersion } = scenario;
+  // A label placed but never named is just an unfinished placeholder in the editor —
+  // it already renders as nothing (see hexRenderer's drawLabels) and shouldn't be
+  // saved into the file either.
+  withoutVersion.map = {
+    ...withoutVersion.map,
+    labels: withoutVersion.map.labels.filter((l) => l.name.trim() !== ""),
+  };
   const hash = md5(pyDumpsSorted(withoutVersion));
   const now = Math.floor(Date.now() / 1000);
   return {
