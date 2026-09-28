@@ -1,8 +1,10 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useStore } from "../state/store";
 import { exportScenarioToFile, parseScenarioFromJson } from "../lib/exportImport";
+import ConvertDialog from "./ConvertDialog";
 
 export default function TopBar() {
+  const [showConvert, setShowConvert] = useState(false);
   const projects = useStore((s) => s.projects);
   const activeProjectId = useStore((s) => s.activeProjectId);
   const scenario = useStore((s) => s.scenario);
@@ -46,9 +48,11 @@ export default function TopBar() {
           onChange={handleFileChange}
         />
         <button onClick={() => exportScenarioToFile(scenario)}>Export JSON</button>
+        <button onClick={() => setShowConvert(true)}>Convert v1 → v2</button>
         <button onClick={undo}>Undo</button>
         <button onClick={redo}>Redo</button>
       </div>
+      {showConvert && <ConvertDialog onClose={() => setShowConvert(false)} />}
       <div className="tabstrip">
         {projects.map((p) => (
           <div

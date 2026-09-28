@@ -434,3 +434,43 @@ legend {
 .file-button input[type="file"] {
   display: none;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  width: 480px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
+.convert-errors ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.convert-errors li {
+  margin-bottom: 4px;
+}
+
+.convert-success {
+  margin-top: 8px;
+}
