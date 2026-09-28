@@ -321,8 +321,8 @@ function drawHex(
   if (unitsAlpha !== null && unitsHere.length > 0) {
     ctx.save();
     ctx.globalAlpha = unitsAlpha;
-    const size = 16;
-    const baseY = py + 18;
+    const size = 62;
+    const baseY = py;
     unitsHere.forEach((u, i) => {
       const ux = px - (unitsHere.length - 1) * (size / 2) + i * size;
       const unitType = scenario.unit_types.find((t) => t.id === u.type);
