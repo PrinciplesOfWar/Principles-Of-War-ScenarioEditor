@@ -65,6 +65,7 @@ interface StoreState {
   selectedHex: { x: number; y: number } | null;
   selectedLabelSlot: { edge: number | null } | null;
   layerSettings: Record<LayerId, LayerSettings>;
+  cycledUnitIndex: Record<string, number>;
 
   setActiveLayer: (l: LayerId) => void;
   setActiveTerrain: (t: TerrainType) => void;
@@ -72,6 +73,7 @@ interface StoreState {
   setActiveLandmark: (l: LandmarkType) => void;
   setActiveLabelType: (t: LabelType) => void;
   selectHex: (x: number, y: number) => void;
+  cycleUnitAtHex: (x: number, y: number) => void;
   setLayerVisible: (id: LayerId, visible: boolean) => void;
   setLayerOpacity: (id: LayerId, opacity: number) => void;
 
@@ -163,6 +165,7 @@ export const useStore = create<StoreState>((set, get) => ({
   selectedHex: null,
   selectedLabelSlot: null,
   layerSettings: loadLayerSettings(),
+  cycledUnitIndex: {},
 
   setActiveLayer: (l) => set({ activeLayer: l }),
   setActiveTerrain: (t) => set({ activeTerrain: t }),
@@ -170,6 +173,15 @@ export const useStore = create<StoreState>((set, get) => ({
   setActiveLandmark: (l) => set({ activeLandmark: l }),
   setActiveLabelType: (t) => set({ activeLabelType: t }),
   selectHex: (x, y) => set({ selectedHex: { x, y }, selectedLabelSlot: null }),
+
+  cycleUnitAtHex: (x, y) => {
+    const { scenario, cycledUnitIndex } = get();
+    const count = scenario.units.filter((u) => u.x === x && u.y === y).length;
+    if (count <= 1) return;
+    const key = `${x},${y}`;
+    const current = cycledUnitIndex[key] ?? 0;
+    set({ cycledUnitIndex: { ...cycledUnitIndex, [key]: (current + 1) % count } });
+  },
 
   setLayerVisible: (id, visible) => {
     const next = { ...get().layerSettings, [id]: { ...get().layerSettings[id], visible } };

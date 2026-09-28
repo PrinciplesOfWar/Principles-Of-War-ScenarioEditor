@@ -46,6 +46,8 @@ export default function HexCanvas() {
   const placeOrSelectLabel = useStore((s) => s.placeOrSelectLabel);
   const referenceImage = useStore((s) => s.referenceImage);
   const layerSettings = useStore((s) => s.layerSettings);
+  const cycledUnitIndex = useStore((s) => s.cycledUnitIndex);
+  const cycleUnitAtHex = useStore((s) => s.cycleUnitAtHex);
 
   const [view, setView] = useState({ zoom: 1, offsetX: 40, offsetY: 40 });
   const [isPanning, setIsPanning] = useState(false);
@@ -93,6 +95,7 @@ export default function HexCanvas() {
       activeLayer,
       selectedHex,
       layerSettings,
+      cycledUnitIndex,
       loadedImage && referenceImage
         ? { img: loadedImage, scaleX: referenceImage.scaleX, scaleY: referenceImage.scaleY }
         : null
@@ -192,7 +195,7 @@ export default function HexCanvas() {
   }
 
   function handlePointerDown(e: React.PointerEvent) {
-    if (e.button === 1 || e.button === 2 || e.shiftKey) {
+    if (e.button === 1 || e.shiftKey) {
       setIsPanning(true);
       setHoverHex(null);
       panStart.current = { x: e.clientX, y: e.clientY, offsetX: view.offsetX, offsetY: view.offsetY };
@@ -226,6 +229,14 @@ export default function HexCanvas() {
     setIsPanning(false);
   }
 
+  function handleContextMenu(e: React.MouseEvent) {
+    e.preventDefault();
+    if (isPanning) return;
+    const { x: wx, y: wy } = toWorld(e.clientX, e.clientY);
+    const { x, y } = pixelToHex(wx, wy);
+    cycleUnitAtHex(x, y);
+  }
+
   const hoverTooltip = (() => {
     if (!hoverHex) return null;
     const hex = scenario.map.hexagons.find((h) => h.x === hoverHex.x && h.y === hoverHex.y);
@@ -243,7 +254,7 @@ export default function HexCanvas() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={() => setHoverHex(null)}
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={handleContextMenu}
       />
       <div className="zoom-controls">
         <button onClick={() => zoomBy(1 / 1.2)}>-</button>

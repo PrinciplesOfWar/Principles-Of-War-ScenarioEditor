@@ -8,7 +8,7 @@ import {
   neighborOffset,
 } from "../../lib/hexGrid";
 import type { LayerId, LayerSettings } from "../../types/app";
-import type { HexagonV2, LabelEntry, ScenarioV2 } from "../../types/scenarioV2";
+import type { HexagonV2, LabelEntry, ScenarioV2, UnitV2 } from "../../types/scenarioV2";
 
 const TERRAIN_COLORS: Record<string, string> = {
   grass: "#6fa84b",
@@ -64,6 +64,7 @@ export function drawScenario(
   activeLayer: LayerId,
   _selected: { x: number; y: number } | null,
   layerSettings: Record<LayerId, LayerSettings>,
+  cycledUnitIndex: Record<string, number>,
   referenceImage?: {
     img: HTMLImageElement;
     scaleX: number;
@@ -74,7 +75,7 @@ export function drawScenario(
   ctx.clearRect(0, 0, width, height);
 
   for (const hex of scenario.map.hexagons) {
-    drawHex(ctx, hex, scenario, activeLayer, layerSettings);
+    drawHex(ctx, hex, scenario, activeLayer, layerSettings, cycledUnitIndex);
   }
 
   const imageAlpha = layerAlpha(layerSettings, "image");
@@ -199,12 +200,55 @@ function drawRailwayNode(ctx: CanvasRenderingContext2D, scenario: ScenarioV2, he
   ctx.fill();
 }
 
+function drawUnitStat(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 3;
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = "#fff";
+  ctx.fillText(text, x, y);
+}
+
+function drawUnitStats(ctx: CanvasRenderingContext2D, u: UnitV2, ux: number, uy: number, size: number) {
+  const marginX = size * 0.15;
+  const marginY = size * 0.35;
+  const left = ux - size / 2 + marginX;
+  const right = ux + size / 2 - marginX;
+  const top = uy - size / 2 + marginY;
+  const bottom = uy + size / 2 - marginY;
+
+  ctx.save();
+  ctx.font = `bold ${Math.round(size * 0.22)}px sans-serif`;
+  ctx.lineJoin = "round";
+  ctx.textBaseline = "middle";
+
+  ctx.textAlign = "left";
+  drawUnitStat(ctx, String(u.attack), left, bottom);
+  drawUnitStat(ctx, String(u.movement), left, top);
+
+  ctx.textAlign = "right";
+  drawUnitStat(ctx, String(u.defense), right, bottom);
+
+  ctx.restore();
+}
+
+function drawUnitIndexBadge(ctx: CanvasRenderingContext2D, px: number, py: number, index: number, total: number) {
+  const [cx, cy] = hexCorners(px, py)[1]; // top-right corner
+  ctx.save();
+  ctx.font = "bold 12px sans-serif";
+  ctx.lineJoin = "round";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "top";
+  drawUnitStat(ctx, `${index}/${total}`, cx - 4, cy + 6);
+  ctx.restore();
+}
+
 function drawHex(
   ctx: CanvasRenderingContext2D,
   hex: HexagonV2,
   scenario: ScenarioV2,
   activeLayer: LayerId,
-  layerSettings: Record<LayerId, LayerSettings>
+  layerSettings: Record<LayerId, LayerSettings>,
+  cycledUnitIndex: Record<string, number>
 ) {
   const { px, py } = hexToPixel(hex.x, hex.y);
   const corners = hexCorners(px, py);
@@ -321,28 +365,32 @@ function drawHex(
   if (unitsAlpha !== null && unitsHere.length > 0) {
     ctx.save();
     ctx.globalAlpha = unitsAlpha;
-    const size = 16;
-    const baseY = py + 18;
-    unitsHere.forEach((u, i) => {
-      const ux = px - (unitsHere.length - 1) * (size / 2) + i * size;
-      const unitType = scenario.unit_types.find((t) => t.id === u.type);
-      const base64 = unitType ? scenario.unit_icons[unitType.icon] : undefined;
-      const iconImg = unitType && base64 ? getUnitIconImage(unitType.icon, base64) : null;
-      if (isImageReady(iconImg)) {
-        ctx.drawImage(iconImg, ux - size / 2, baseY - size / 2, size, size);
-      } else {
-        // Fallback while the icon loads (or when the unit has none assigned yet) —
-        // a faction-colored dot, same as before icons were drawn.
-        ctx.beginPath();
-        ctx.arc(ux, baseY, size / 3, 0, Math.PI * 2);
-        const color = factionColor(scenario, u.faction);
-        ctx.fillStyle = color === "transparent" ? "#888" : color;
-        ctx.fill();
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    });
+    const size = 74; // 20% bigger than the original 62
+    // Only one unit is shown per hex at a time; right-click cycles which one via
+    // cycledUnitIndex, keyed by hex coordinate.
+    const index = (cycledUnitIndex[`${hex.x},${hex.y}`] ?? 0) % unitsHere.length;
+    const u = unitsHere[index];
+    const unitType = scenario.unit_types.find((t) => t.id === u.type);
+    const base64 = unitType ? scenario.unit_icons[unitType.icon] : undefined;
+    const iconImg = unitType && base64 ? getUnitIconImage(unitType.icon, base64) : null;
+    if (isImageReady(iconImg)) {
+      ctx.drawImage(iconImg, px - size / 2, py - size / 2, size, size);
+    } else {
+      // Fallback while the icon loads (or when the unit has none assigned yet) —
+      // a faction-colored dot, same as before icons were drawn.
+      ctx.beginPath();
+      ctx.arc(px, py, size / 3, 0, Math.PI * 2);
+      const color = factionColor(scenario, u.faction);
+      ctx.fillStyle = color === "transparent" ? "#888" : color;
+      ctx.fill();
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    drawUnitStats(ctx, u, px, py, size);
+    if (unitsHere.length > 1) {
+      drawUnitIndexBadge(ctx, px, py, index + 1, unitsHere.length);
+    }
     ctx.restore();
   }
 
