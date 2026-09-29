@@ -6,7 +6,7 @@
     "type": "original",
     "description": "The bitter winter of 1941-1942 brings the German advance to a halt. Reeling from their failure to capture Moscow, battered Wehrmacht forces now face a resurgent Red Army, determined to drive the invaders from Soviet soil. In the dense forests and frozen swamps south of Leningrad, a new crisis emerges: at Demyansk, elements of the German II Army Corps and parts of the X Army Corps find themselves cut off and surrounded by Soviet forces in an encirclement.\n\nTrapped deep behind enemy lines, over 90,000 Axis troops must endure relentless attacks, starvation, and the unforgiving cold. Yet, in a desperate gamble, the German High Command orchestrates an audacious resupply effort by air-an innovation that keeps the pocket alive against all odds. The outcome at Demyansk will echo through the rest of the war, shaping German strategy for future battles yet to come.\n\nCan the Wehrmacht restore the supply lines and rescue the encircled forces before it's too late? With the fate of the German Second Corps hanging in the balance, will they manage to break free, or will the Soviet armies tighten the noose and eliminate the pocket before a relief operation can break through?",
     "created_at": 1790629969,
-    "updated_at": 1790634431
+    "updated_at": 1790716683
   },
   "factions": [
     {
@@ -651,8 +651,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -674,8 +674,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -831,8 +831,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -854,7 +854,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -1483,8 +1483,8 @@
         "logistics": true,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -1506,8 +1506,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -1663,7 +1663,7 @@
         "logistics": false,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -1685,9 +1685,9 @@
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -2226,7 +2226,7 @@
         "river": [
           false,
           false,
-          true,
+          false,
           false,
           false,
           false
@@ -2246,7 +2246,7 @@
         "river": [
           false,
           false,
-          true,
+          false,
           false,
           false,
           false
@@ -2325,7 +2325,7 @@
         "logistics": false,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -2347,9 +2347,9 @@
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -2524,8 +2524,8 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -2547,8 +2547,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -3030,7 +3030,7 @@
         "river": [
           false,
           false,
-          true,
+          false,
           false,
           false,
           false
@@ -3049,7 +3049,7 @@
         "logistics": false,
         "river": [
           false,
-          true,
+          false,
           true,
           false,
           false,
@@ -3068,10 +3068,10 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          false,
+          false,
           true,
-          false,
-          false,
-          false,
+          true,
           false,
           false
         ],
@@ -3088,10 +3088,10 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          true,
-          true,
           false,
           false,
+          false,
+          true,
           false,
           false
         ],
@@ -3110,7 +3110,7 @@
         "river": [
           false,
           false,
-          true,
+          false,
           false,
           false,
           false
@@ -3168,9 +3168,9 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false,
           false
@@ -3192,7 +3192,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -3372,8 +3372,8 @@
         "landmark": null,
         "logistics": true,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -3395,8 +3395,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -3881,7 +3881,7 @@
         "logistics": false,
         "river": [
           false,
-          true,
+          false,
           false,
           false,
           false,
@@ -3900,9 +3900,9 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          false,
           true,
-          false,
-          false,
+          true,
           false,
           false,
           false
@@ -3920,11 +3920,11 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
           false,
           false,
           false,
-          false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -3940,12 +3940,12 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -3960,11 +3960,11 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          false,
+          false,
           true,
-          false,
-          false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -3980,10 +3980,10 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          false,
+          false,
+          false,
           true,
-          false,
-          false,
-          false,
           false,
           false
         ],
@@ -4021,7 +4021,7 @@
         "logistics": true,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -4043,9 +4043,9 @@
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -4240,9 +4240,9 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false,
           false
@@ -4262,9 +4262,9 @@
         "river": [
           false,
           false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -4283,7 +4283,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false,
           false
         ],
@@ -4732,7 +4732,7 @@
         },
         "logistics": false,
         "river": [
-          true,
+          false,
           true,
           true,
           false,
@@ -4757,7 +4757,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -4792,7 +4792,7 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
+          true,
           false,
           false,
           false,
@@ -4812,12 +4812,12 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -4835,8 +4835,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -4872,9 +4872,9 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false,
           false
@@ -4896,7 +4896,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -5079,8 +5079,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -5098,12 +5098,12 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -5118,12 +5118,12 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -5141,8 +5141,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -5682,8 +5682,8 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -5705,8 +5705,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -5723,8 +5723,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -5746,8 +5746,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -5884,7 +5884,7 @@
         "river": [
           false,
           false,
-          false,
+          true,
           false,
           false,
           false
@@ -5904,8 +5904,8 @@
         "river": [
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false
         ],
@@ -5923,9 +5923,9 @@
         "logistics": true,
         "river": [
           false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false
         ],
@@ -5946,8 +5946,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -5982,8 +5982,8 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -6513,14 +6513,14 @@
       {
         "x": 26,
         "y": 7,
-        "terrain": "grass",
+        "terrain": "forest",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false,
           false
@@ -6539,10 +6539,10 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -6562,8 +6562,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -6720,12 +6720,12 @@
         },
         "logistics": false,
         "river": [
+          true,
           false,
           false,
           false,
           false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -6740,12 +6740,12 @@
         "landmark": null,
         "logistics": true,
         "river": [
+          true,
           false,
           false,
           false,
           false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -6765,7 +6765,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -6820,7 +6820,7 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
+          true,
           false,
           false,
           false,
@@ -7356,10 +7356,10 @@
         "terrain": "grass",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -7373,17 +7373,17 @@
       {
         "x": 27,
         "y": 8,
-        "terrain": "grass",
+        "terrain": "forest",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
+          true,
           false,
           false,
-          false,
-          false,
-          false,
-          false
+          true,
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -7393,7 +7393,7 @@
       {
         "x": 28,
         "y": 8,
-        "terrain": "grass",
+        "terrain": "forest",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
         "logistics": false,
@@ -7403,7 +7403,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -8166,7 +8166,7 @@
         "terrain": "grass",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           false,
@@ -8186,10 +8186,10 @@
         "terrain": "grass",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -8206,13 +8206,13 @@
         "terrain": "grass",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
           false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -8230,8 +8230,8 @@
         "river": [
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false
         ],
@@ -8251,7 +8251,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false,
           false
         ],
@@ -9027,12 +9027,12 @@
       {
         "x": 27,
         "y": 10,
-        "terrain": "forest",
+        "terrain": "grass",
         "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
-          false,
+          true,
           false,
           false,
           false,
@@ -9052,12 +9052,12 @@
         "landmark": null,
         "logistics": true,
         "river": [
+          true,
           false,
           false,
           false,
           false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -9076,12 +9076,12 @@
         },
         "logistics": true,
         "river": [
+          true,
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -9099,8 +9099,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -9138,7 +9138,7 @@
         "river": [
           false,
           false,
-          false,
+          true,
           false,
           false,
           false
@@ -9902,8 +9902,8 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -9925,8 +9925,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -9943,8 +9943,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -9966,8 +9966,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -10128,7 +10128,7 @@
         "river": [
           false,
           false,
-          false,
+          true,
           false,
           false,
           false
@@ -10141,8 +10141,8 @@
       {
         "x": 41,
         "y": 11,
-        "terrain": "forest",
-        "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
+        "terrain": "water",
+        "faction": "neutral",
         "landmark": null,
         "logistics": false,
         "river": [
@@ -10154,9 +10154,7 @@
           false
         ],
         "port": false,
-        "objective": [
-          "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc"
-        ]
+        "objective": []
       },
       {
         "x": 0,
@@ -10754,8 +10752,8 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false,
@@ -10775,10 +10773,10 @@
         "logistics": true,
         "river": [
           false,
-          false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
+          true,
           false
         ],
         "port": false,
@@ -10798,8 +10796,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -10955,8 +10953,8 @@
         "logistics": true,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -10978,8 +10976,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -11590,7 +11588,7 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
+          true,
           false,
           false,
           false,
@@ -11615,7 +11613,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -11771,8 +11769,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -11798,8 +11796,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -12617,8 +12615,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -12640,8 +12638,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -13258,8 +13256,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -13281,7 +13279,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -13417,8 +13415,8 @@
         "river": [
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false
         ],
@@ -13436,9 +13434,9 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false
         ],
@@ -13459,8 +13457,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -14131,7 +14129,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -14274,7 +14272,7 @@
         },
         "logistics": true,
         "river": [
-          false,
+          true,
           false,
           false,
           false,
@@ -14294,12 +14292,12 @@
         "landmark": null,
         "logistics": true,
         "river": [
+          true,
           false,
           false,
           false,
           false,
-          false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -14319,7 +14317,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -14719,8 +14717,8 @@
         "logistics": false,
         "river": [
           true,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -14743,7 +14741,7 @@
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -15047,7 +15045,7 @@
         "x": 33,
         "y": 17,
         "terrain": "water",
-        "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
+        "faction": "neutral",
         "landmark": null,
         "logistics": false,
         "river": [
@@ -15059,9 +15057,7 @@
           false
         ],
         "port": false,
-        "objective": [
-          "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc"
-        ]
+        "objective": []
       },
       {
         "x": 34,
@@ -15578,7 +15574,7 @@
         "logistics": false,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -15601,9 +15597,9 @@
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -16428,11 +16424,11 @@
         "terrain": "forest",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false,
           false
@@ -16449,13 +16445,13 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -17281,7 +17277,7 @@
         "logistics": false,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -17299,14 +17295,14 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -17320,7 +17316,7 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           false,
@@ -18127,9 +18123,9 @@
         "landmark": null,
         "logistics": false,
         "river": [
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false,
           false
@@ -18146,13 +18142,13 @@
         "terrain": "forest",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
           false,
           false,
           false,
-          false,
+          true,
           false
         ],
         "port": false,
@@ -18971,8 +18967,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -18989,14 +18985,14 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -19010,7 +19006,7 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           true,
@@ -19808,8 +19804,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -19826,14 +19822,14 @@
         "terrain": "forest",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -19847,7 +19843,7 @@
         "terrain": "forest",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           true,
@@ -20668,8 +20664,8 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
+          true,
+          true,
           false,
           false,
           false
@@ -20686,14 +20682,14 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": true,
+        "logistics": false,
         "river": [
           false,
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -20707,7 +20703,7 @@
         "terrain": "forest",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           true,
@@ -20735,7 +20731,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -21485,7 +21481,7 @@
         "river": [
           false,
           false,
-          false,
+          true,
           false,
           false,
           false
@@ -21504,9 +21500,9 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false
         ],
@@ -21527,8 +21523,8 @@
           false,
           false,
           false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -21542,7 +21538,7 @@
         "terrain": "grass",
         "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
         "landmark": null,
-        "logistics": false,
+        "logistics": true,
         "river": [
           false,
           false,
@@ -22311,7 +22307,7 @@
         "river": [
           false,
           false,
-          false,
+          true,
           false,
           false,
           false
@@ -22330,9 +22326,9 @@
         "logistics": false,
         "river": [
           false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
           false,
           false
         ],
@@ -22349,12 +22345,12 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -22378,7 +22374,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -23143,7 +23139,7 @@
         "logistics": false,
         "river": [
           false,
-          false,
+          true,
           false,
           false,
           false,
@@ -23162,12 +23158,12 @@
         "landmark": null,
         "logistics": false,
         "river": [
+          true,
           false,
           false,
           false,
-          false,
-          false,
-          false
+          true,
+          true
         ],
         "port": false,
         "objective": [
@@ -23187,7 +23183,7 @@
           false,
           false,
           false,
-          false
+          true
         ],
         "port": false,
         "objective": [
@@ -23653,7 +23649,7 @@
         "x": 37,
         "y": 27,
         "terrain": "water",
-        "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
+        "faction": "neutral",
         "landmark": null,
         "logistics": true,
         "river": [
@@ -23665,9 +23661,7 @@
           false
         ],
         "port": false,
-        "objective": [
-          "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc"
-        ]
+        "objective": []
       },
       {
         "x": 38,
@@ -25335,7 +25329,7 @@
         "x": 36,
         "y": 29,
         "terrain": "grass",
-        "faction": "neutral",
+        "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
         "logistics": true,
         "river": [
@@ -25347,7 +25341,9 @@
           false
         ],
         "port": false,
-        "objective": []
+        "objective": [
+          "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc"
+        ]
       },
       {
         "x": 37,
@@ -26244,7 +26240,7 @@
         "x": 39,
         "y": 30,
         "terrain": "water",
-        "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
+        "faction": "neutral",
         "landmark": null,
         "logistics": false,
         "river": [
@@ -26256,9 +26252,7 @@
           false
         ],
         "port": false,
-        "objective": [
-          "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc"
-        ]
+        "objective": []
       },
       {
         "x": 40,
@@ -27064,7 +27058,7 @@
         "x": 38,
         "y": 31,
         "terrain": "grass",
-        "faction": "neutral",
+        "faction": "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc",
         "landmark": null,
         "logistics": false,
         "river": [
@@ -27076,7 +27070,9 @@
           false
         ],
         "port": false,
-        "objective": []
+        "objective": [
+          "5b62ff3e-c9a6-4f6f-8734-d7f14cc690cc"
+        ]
       },
       {
         "x": 39,
@@ -28982,7 +28978,7 @@
         "x": 7,
         "y": 34,
         "terrain": "water",
-        "faction": "21ee203c-23ae-426e-a34e-da4d9c6ed901",
+        "faction": "neutral",
         "landmark": null,
         "logistics": false,
         "river": [
@@ -28994,9 +28990,7 @@
           false
         ],
         "port": false,
-        "objective": [
-          "21ee203c-23ae-426e-a34e-da4d9c6ed901"
-        ]
+        "objective": []
       },
       {
         "x": 8,
@@ -32210,13 +32204,6 @@
         "name": "Volga River"
       },
       {
-        "x": 34,
-        "y": 31,
-        "edge": 1,
-        "type": "water",
-        "name": "Lake Seliger"
-      },
-      {
         "x": 18,
         "y": 27,
         "edge": 1,
@@ -32252,221 +32239,11 @@
         "name": "Polist' River"
       },
       {
-        "x": 36,
-        "y": 33,
-        "edge": 1,
-        "type": "water",
-        "name": "Selizharovka River"
-      },
-      {
-        "x": 33,
-        "y": 32,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Sabro"
-      },
-      {
-        "x": 32,
-        "y": 33,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Glubokoye"
-      },
-      {
-        "x": 36,
-        "y": 34,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Sig"
-      },
-      {
-        "x": 33,
-        "y": 29,
-        "edge": 1,
-        "type": "water",
-        "name": "Lake Seliger"
-      },
-      {
-        "x": 30,
-        "y": 32,
-        "edge": null,
-        "type": "water",
-        "name": "Volga River"
-      },
-      {
-        "x": 24,
-        "y": 37,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Luchanskoye"
-      },
-      {
-        "x": 25,
-        "y": 35,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Lopastitsa"
-      },
-      {
-        "x": 39,
-        "y": 28,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Kamennoye"
-      },
-      {
-        "x": 38,
-        "y": 25,
-        "edge": 2,
-        "type": "water",
-        "name": "Lake Granychnoye"
-      },
-      {
-        "x": 35,
-        "y": 26,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Seliger"
-      },
-      {
-        "x": 37,
-        "y": 21,
-        "edge": 2,
-        "type": "water",
-        "name": "Lake Shlino"
-      },
-      {
-        "x": 34,
-        "y": 21,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Vel'ye "
-      },
-      {
-        "x": 37,
-        "y": 27,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Seremo"
-      },
-      {
-        "x": 39,
-        "y": 30,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Sonino"
-      },
-      {
-        "x": 35,
-        "y": 18,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Gorodenskoye"
-      },
-      {
-        "x": 33,
-        "y": 17,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Russkoye"
-      },
-      {
-        "x": 36,
-        "y": 15,
-        "edge": 0,
-        "type": "water",
-        "name": "Lake Valdayskoye"
-      },
-      {
-        "x": 36,
-        "y": 10,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Borovno"
-      },
-      {
-        "x": 35,
-        "y": 7,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Zaozer'ye"
-      },
-      {
-        "x": 32,
-        "y": 5,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Vyaloye"
-      },
-      {
-        "x": 24,
-        "y": 25,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Dekhino"
-      },
-      {
-        "x": 13,
-        "y": 30,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Rdeyskoye"
-      },
-      {
-        "x": 10,
-        "y": 31,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Russkoye"
-      },
-      {
-        "x": 8,
-        "y": 32,
-        "edge": 0,
-        "type": "water",
-        "name": "Lake Polisto"
-      },
-      {
-        "x": 7,
-        "y": 30,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Susel'nitskoye"
-      },
-      {
-        "x": 9,
-        "y": 36,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Dulovo"
-      },
-      {
-        "x": 5,
-        "y": 36,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Dubets"
-      },
-      {
-        "x": 7,
-        "y": 34,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Tsevlo"
-      },
-      {
         "x": 0,
         "y": 19,
         "edge": 1,
         "type": "water",
         "name": "Shelon' River"
-      },
-      {
-        "x": 12,
-        "y": 26,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Krasnodubskoye"
       },
       {
         "x": 10,
@@ -32476,32 +32253,11 @@
         "name": "Lake Dolzhino"
       },
       {
-        "x": 0,
-        "y": 25,
-        "edge": 2,
-        "type": "water",
-        "name": "Lake Gorodnovskoye"
-      },
-      {
         "x": 13,
         "y": 15,
         "edge": 1,
         "type": "water",
         "name": "Perekhoda River"
-      },
-      {
-        "x": 4,
-        "y": 4,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Vrevo"
-      },
-      {
-        "x": 3,
-        "y": 2,
-        "edge": null,
-        "type": "water",
-        "name": "Lake Cheremenets"
       },
       {
         "x": 6,
@@ -32511,13 +32267,6 @@
         "name": "Luga River"
       },
       {
-        "x": 15,
-        "y": 7,
-        "edge": 1,
-        "type": "water",
-        "name": "Veryazha River"
-      },
-      {
         "x": 19,
         "y": 2,
         "edge": 1,
@@ -32525,8 +32274,36 @@
         "name": "Volkhov River"
       },
       {
-        "x": 22,
-        "y": 3,
+        "x": 34,
+        "y": 31,
+        "edge": 1,
+        "type": "water",
+        "name": "Lake Seliger"
+      },
+      {
+        "x": 24,
+        "y": 4,
+        "edge": 1,
+        "type": "water",
+        "name": "Msta River"
+      },
+      {
+        "x": 16,
+        "y": 24,
+        "edge": 1,
+        "type": "water",
+        "name": "Porus'ya River"
+      },
+      {
+        "x": 29,
+        "y": 11,
+        "edge": 1,
+        "type": "water",
+        "name": "Kholova River"
+      },
+      {
+        "x": 37,
+        "y": 1,
         "edge": 1,
         "type": "water",
         "name": "Msta River"
@@ -33513,6 +33290,6 @@
     "514b916e18a50a4d": "iVBORw0KGgoAAAANSUhEUgAAAHgAAACMCAYAAAC3Z23dAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAZdEVYdFNvZnR3YXJlAFBhaW50Lk5FVCA1LjEuMTGKCBbOAAAAuGVYSWZJSSoACAAAAAUAGgEFAAEAAABKAAAAGwEFAAEAAABSAAAAKAEDAAEAAAACAAAAMQECABEAAABaAAAAaYcEAAEAAABsAAAAAAAAAPJ2AQDoAwAA8nYBAOgDAABQYWludC5ORVQgNS4xLjExAAADAACQBwAEAAAAMDIzMAGgAwABAAAAAQAAAAWgBAABAAAAlgAAAAAAAAACAAEAAgAEAAAAUjk4AAIABwAEAAAAMDEwMAAAAABc7WH6CeiquwAAASRJREFUeF7t1TEKwzAUBUE7Fw85udO4+oVRExSWmU6vXSQdBwAAAAAAAAAAAAAA/LFzDg+uObDVUrvXHGgROE7guKV3/Db/4M8481vvcV5q5wbHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHnXN4cM2BrZbaucFxAscJDAAAAAAAAAAAAAAA7PMFq5UEsozA2ugAAAAASUVORK5CYII="
   },
   "version": {
-    "hash": "aa9b5061f19522e50a66a1478bbc4799"
+    "hash": "fcc75ac0b98d7fa8b7f6ed271e1e4867"
   }
 }

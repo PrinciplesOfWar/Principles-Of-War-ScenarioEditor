@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useStore } from "../state/store";
-import { exportScenarioToFile, parseScenarioFromJson } from "../lib/exportImport";
+import { computeScenarioForExport, downloadScenarioFile, parseScenarioFromJson } from "../lib/exportImport";
 import ConvertDialog from "./ConvertDialog";
 
 export default function TopBar() {
@@ -12,12 +12,21 @@ export default function TopBar() {
   const closeProject = useStore((s) => s.closeProject);
   const newScenario = useStore((s) => s.newScenario);
   const loadScenario = useStore((s) => s.loadScenario);
+  const update = useStore((s) => s.update);
   const undo = useStore((s) => s.undo);
   const redo = useStore((s) => s.redo);
   const fileInput = useRef<HTMLInputElement>(null);
 
   function handleImportClick() {
     fileInput.current?.click();
+  }
+
+  function handleExport() {
+    const final = computeScenarioForExport(scenario);
+    downloadScenarioFile(final);
+    // Reload the exported result into the current tab so the editor's
+    // version hash matches what was just written to disk.
+    update(() => final);
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -47,7 +56,7 @@ export default function TopBar() {
           style={{ display: "none" }}
           onChange={handleFileChange}
         />
-        <button onClick={() => exportScenarioToFile(scenario)}>Export JSON</button>
+        <button onClick={handleExport}>Export JSON</button>
         <button onClick={() => setShowConvert(true)}>Convert v1 → v2</button>
         <button onClick={undo}>Undo</button>
         <button onClick={redo}>Redo</button>

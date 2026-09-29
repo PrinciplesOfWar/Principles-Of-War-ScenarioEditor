@@ -11,6 +11,11 @@ export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
   withoutVersion.map = {
     ...withoutVersion.map,
     labels: withoutVersion.map.labels.filter((l) => l.name.trim() !== ""),
+    // Water hexes can't belong to a faction — force them neutral regardless of
+    // what was painted in the faction layer.
+    hexagons: withoutVersion.map.hexagons.map((h) =>
+      h.terrain === "water" && h.faction !== "neutral" ? { ...h, faction: "neutral" } : h
+    ),
   };
   const hash = md5(pyDumpsSorted(withoutVersion));
   const now = Math.floor(Date.now() / 1000);
@@ -21,19 +26,22 @@ export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
   };
 }
 
-export function exportScenarioToFile(scenario: ScenarioV2): void {
-  const final = computeScenarioForExport(scenario);
-  const blob = new Blob([JSON.stringify(final, null, 2)], {
+export function downloadScenarioFile(scenario: ScenarioV2): void {
+  const blob = new Blob([JSON.stringify(scenario, null, 2)], {
     type: "application/json",
   });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${final.metadata.id || "scenario"}.json`;
+  a.download = `${scenario.metadata.id || "scenario"}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+export function exportScenarioToFile(scenario: ScenarioV2): void {
+  downloadScenarioFile(computeScenarioForExport(scenario));
 }
 
 export function parseScenarioFromJson(text: string): ScenarioV2 {
