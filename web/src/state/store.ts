@@ -107,6 +107,24 @@ function getHex(s: ScenarioV2, x: number, y: number): HexagonV2 | undefined {
   return s.map.hexagons.find((h) => h.x === x && h.y === y);
 }
 
+function isAdjacentToWater(s: ScenarioV2, x: number, y: number): boolean {
+  for (let edge = 0; edge < 6; edge++) {
+    const n = neighborOffset(x, y, edge);
+    if (getHex(s, n.x, n.y)?.terrain === "water") return true;
+  }
+  return false;
+}
+
+// A port only makes sense on a hex adjacent to water — clear it on the hex
+// itself and on any neighbor that no longer qualifies after a terrain edit.
+function clearInvalidPorts(s: ScenarioV2, x: number, y: number): void {
+  for (let edge = -1; edge < 6; edge++) {
+    const { x: nx, y: ny } = edge === -1 ? { x, y } : neighborOffset(x, y, edge);
+    const h = getHex(s, nx, ny);
+    if (h?.port && !isAdjacentToWater(s, nx, ny)) h.port = false;
+  }
+}
+
 function makeId(): string {
   return Math.random().toString(36).slice(2, 10);
 }
@@ -316,7 +334,28 @@ export const useStore = create<StoreState>((set, get) => ({
     const { activeTerrain } = get();
     get().update((s) => {
       const h = getHex(s, x, y);
-      if (h) h.terrain = activeTerrain;
+      if (!h) return s;
+      h.terrain = activeTerrain;
+      if (activeTerrain === "water") {
+        // Water hexes can't belong to a faction, be an objective, carry a
+        // landmark, have logistics, or host units.
+        h.faction = "neutral";
+        h.objective = [];
+        h.landmark = null;
+        h.logistics = false;
+        s.units = s.units.filter((u) => !(u.x === x && u.y === y));
+        // Nor can a river run along any of its edges — clear this hex's own
+        // edges and the mirrored edge on each neighbor that shares one.
+        for (let edge = 0; edge < 6; edge++) {
+          h.river[edge] = false;
+          const n = neighborOffset(x, y, edge);
+          const neighborHex = getHex(s, n.x, n.y);
+          if (neighborHex) neighborHex.river[oppositeEdge(edge)] = false;
+        }
+      }
+      // Terrain changes can gain or lose water adjacency for this hex and its
+      // neighbors, so re-check whether any of their ports are still valid.
+      clearInvalidPorts(s, x, y);
       return s;
     });
   },
@@ -324,7 +363,9 @@ export const useStore = create<StoreState>((set, get) => ({
   paintFaction: (x, y, faction) => {
     get().update((s) => {
       const h = getHex(s, x, y);
-      if (h) h.faction = faction;
+      if (!h) return s;
+      // Water hexes can't belong to a faction — always neutral regardless of brush.
+      h.faction = h.terrain === "water" ? "neutral" : faction;
       return s;
     });
   },
@@ -332,7 +373,10 @@ export const useStore = create<StoreState>((set, get) => ({
   togglePort: (x, y) => {
     get().update((s) => {
       const h = getHex(s, x, y);
-      if (h) h.port = !h.port;
+      if (!h) return s;
+      // A port can only be created on a hex adjacent to water; turning one off is always allowed.
+      if (!h.port && !isAdjacentToWater(s, x, y)) return s;
+      h.port = !h.port;
       return s;
     });
   },
@@ -340,7 +384,9 @@ export const useStore = create<StoreState>((set, get) => ({
   toggleLogistics: (x, y) => {
     get().update((s) => {
       const h = getHex(s, x, y);
-      if (h) h.logistics = !h.logistics;
+      if (!h) return s;
+      if (h.terrain === "water") return s; // water hexes can't have logistics
+      h.logistics = !h.logistics;
       return s;
     });
   },
@@ -349,12 +395,14 @@ export const useStore = create<StoreState>((set, get) => ({
     get().update((s) => {
       const h = getHex(s, x, y);
       if (!h) return s;
+      const n = neighborOffset(x, y, edge);
+      const neighborHex = getHex(s, n.x, n.y);
+      // A river can't run along an edge touching a water hex on either side.
+      if (!h.river[edge] && (h.terrain === "water" || neighborHex?.terrain === "water")) return s;
       const next = !h.river[edge];
       h.river[edge] = next;
 
       // Keep the shared edge in sync on the neighboring hex, if it exists on the map.
-      const n = neighborOffset(x, y, edge);
-      const neighborHex = getHex(s, n.x, n.y);
       if (neighborHex) neighborHex.river[oppositeEdge(edge)] = next;
 
       return s;
@@ -365,6 +413,7 @@ export const useStore = create<StoreState>((set, get) => ({
     get().update((s) => {
       const h = getHex(s, x, y);
       if (!h) return s;
+      if (h.terrain === "water") return s; // water hexes can't be an objective
       const factionId = s.factions[which === "player" ? 0 : 1]?.id;
       if (!factionId) return s; // fewer than 2 factions — this layer is inert
       h.objective = h.objective.includes(factionId)
@@ -378,6 +427,7 @@ export const useStore = create<StoreState>((set, get) => ({
     get().update((s) => {
       const h = getHex(s, x, y);
       if (!h) return s;
+      if (h.terrain === "water" && type !== "default") return s; // water hexes can't carry a landmark
       h.landmark =
         type === "city"
           ? { type: "city", name: "", population: 0 }

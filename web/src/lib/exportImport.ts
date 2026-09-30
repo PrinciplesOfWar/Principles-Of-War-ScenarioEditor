@@ -1,22 +1,54 @@
 import { md5 } from "js-md5";
-import type { ScenarioV2 } from "../types/scenarioV2";
+import { neighborOffset } from "./hexGrid";
+import type { HexagonV2, ScenarioV2 } from "../types/scenarioV2";
 import { pyDumpsSorted } from "./pyJson";
 import { validateScenarioV2 } from "./validateScenarioV2";
+
+function terrainAt(hexagons: HexagonV2[], x: number, y: number): string | undefined {
+  return hexagons.find((h) => h.x === x && h.y === y)?.terrain;
+}
+
+function isAdjacentToWater(hexagons: HexagonV2[], x: number, y: number): boolean {
+  for (let edge = 0; edge < 6; edge++) {
+    const n = neighborOffset(x, y, edge);
+    if (terrainAt(hexagons, n.x, n.y) === "water") return true;
+  }
+  return false;
+}
 
 export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
   const { version: _version, ...withoutVersion } = scenario;
   // A label placed but never named is just an unfinished placeholder in the editor —
   // it already renders as nothing (see hexRenderer's drawLabels) and shouldn't be
   // saved into the file either.
+  const sourceHexagons = withoutVersion.map.hexagons;
   withoutVersion.map = {
     ...withoutVersion.map,
     labels: withoutVersion.map.labels.filter((l) => l.name.trim() !== ""),
-    // Water hexes can't belong to a faction — force them neutral regardless of
-    // what was painted in the faction layer.
-    hexagons: withoutVersion.map.hexagons.map((h) =>
-      h.terrain === "water" && h.faction !== "neutral" ? { ...h, faction: "neutral" } : h
-    ),
+    hexagons: sourceHexagons.map((h) => {
+      // Water hexes can't belong to a faction, be an objective, carry a landmark,
+      // or have logistics — force/clear regardless of what was painted there.
+      if (h.terrain === "water" && (h.faction !== "neutral" || h.objective.length > 0 || h.landmark || h.logistics)) {
+        h = { ...h, faction: "neutral", objective: [], landmark: null, logistics: false };
+      }
+      // A port only makes sense on a hex adjacent to water.
+      if (h.port && !isAdjacentToWater(sourceHexagons, h.x, h.y)) {
+        h = { ...h, port: false };
+      }
+      // A river can't run along an edge touching a water hex on either side.
+      if (h.river.some((r) => r)) {
+        const river = h.river.map((r, edge) => {
+          if (!r || h.terrain === "water") return false;
+          const n = neighborOffset(h.x, h.y, edge);
+          return terrainAt(sourceHexagons, n.x, n.y) === "water" ? false : r;
+        }) as HexagonV2["river"];
+        if (river.some((r, i) => r !== h.river[i])) h = { ...h, river };
+      }
+      return h;
+    }),
   };
+  // Units can't sit on a water hex.
+  withoutVersion.units = withoutVersion.units.filter((u) => terrainAt(sourceHexagons, u.x, u.y) !== "water");
   // id/created_at/updated_at are identity & bookkeeping, not scenario content —
   // excluded so the hash reflects only what the scenario actually contains.
   const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...hashableMetadata } = withoutVersion.metadata;

@@ -12,8 +12,10 @@ export default function UnitPanel() {
   const unitsHere = scenario.units.filter((u) => u.x === x && u.y === y);
   const unitTypes = scenario.unit_types;
   const factions = scenario.factions;
+  const isWater = scenario.map.hexagons.find((h) => h.x === x && h.y === y)?.terrain === "water";
 
   function addUnit() {
+    if (isWater) return; // units can't be placed on water hexes
     const firstType = unitTypes[0];
     update((s) => {
       s.units.push({
@@ -45,6 +47,7 @@ export default function UnitPanel() {
       <h3>
         Units at ({x}, {y})
       </h3>
+      {isWater && <p className="hint">Water hexes can't host units.</p>}
       {unitsHere.length === 0 && <p className="hint">No units here.</p>}
       {unitsHere.map((u, idx) => (
         <div key={idx} className="unit-row">
@@ -126,7 +129,7 @@ export default function UnitPanel() {
           <button onClick={() => removeUnit(idx)}>Remove</button>
         </div>
       ))}
-      <button onClick={addUnit} disabled={unitTypes.length === 0 && factions.length === 0}>
+      <button onClick={addUnit} disabled={isWater || (unitTypes.length === 0 && factions.length === 0)}>
         Add unit
       </button>
     </div>
