@@ -7,6 +7,13 @@ export default function LayerPanel() {
   const layerSettings = useStore((s) => s.layerSettings);
   const setLayerVisible = useStore((s) => s.setLayerVisible);
   const setLayerOpacity = useStore((s) => s.setLayerOpacity);
+  const factions = useStore((s) => s.scenario.factions);
+
+  function layerLabel(l: (typeof LAYERS)[number]): string {
+    if (l.id === "objective_player") return `Objective (${factions[0]?.name ?? "1st faction"})`;
+    if (l.id === "objective_enemy") return `Objective (${factions[1]?.name ?? "2nd faction"})`;
+    return l.label;
+  }
 
   return (
     <div className="panel">
@@ -21,7 +28,7 @@ export default function LayerPanel() {
                   className={activeLayer === l.id ? "active" : ""}
                   onClick={() => setActiveLayer(l.id)}
                 >
-                  {l.label}
+                  {layerLabel(l)}
                 </button>
                 <input
                   type="checkbox"

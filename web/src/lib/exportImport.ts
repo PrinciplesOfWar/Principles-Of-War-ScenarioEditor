@@ -16,6 +16,13 @@ function isAdjacentToWater(hexagons: HexagonV2[], x: number, y: number): boolean
   return false;
 }
 
+// A hex's faction is always neutral if it's water, regardless of what's stored on it.
+function effectiveFactionAt(hexagons: HexagonV2[], x: number, y: number): string | undefined {
+  const h = hexagons.find((hh) => hh.x === x && hh.y === y);
+  if (!h) return undefined;
+  return h.terrain === "water" ? "neutral" : h.faction;
+}
+
 export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
   const { version: _version, ...withoutVersion } = scenario;
   // A label placed but never named is just an unfinished placeholder in the editor —
@@ -47,8 +54,16 @@ export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
       return h;
     }),
   };
-  // Units can't sit on a water hex.
-  withoutVersion.units = withoutVersion.units.filter((u) => terrainAt(sourceHexagons, u.x, u.y) !== "water");
+  // Units can't sit on a water or neutral hex, and always inherit the hex's faction.
+  withoutVersion.units = withoutVersion.units
+    .filter((u) => {
+      const f = effectiveFactionAt(sourceHexagons, u.x, u.y);
+      return f !== undefined && f !== "neutral";
+    })
+    .map((u) => {
+      const f = effectiveFactionAt(sourceHexagons, u.x, u.y)!;
+      return u.faction === f ? u : { ...u, faction: f };
+    });
   // id/created_at/updated_at are identity & bookkeeping, not scenario content —
   // excluded so the hash reflects only what the scenario actually contains.
   const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...hashableMetadata } = withoutVersion.metadata;

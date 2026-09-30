@@ -1,7 +1,18 @@
 import { useState } from "react";
+import { parseIntInRange } from "../../lib/number";
 import { useStore } from "../../state/store";
 import { UNIT_BRANCHES } from "../../types/scenarioV2";
 import IconUploader from "./IconUploader";
+
+// Valid range for each numeric field; fields not listed (fuel_consumption) keep
+// their previous unconstrained behavior.
+const NUMERIC_FIELD_RANGE = {
+  attack: { min: 0, max: Infinity },
+  defense: { min: 1, max: Infinity },
+  movement: { min: 0, max: 4 },
+  cost: { min: 0, max: Infinity },
+  frequency: { min: 1, max: Infinity },
+} as const;
 
 export default function UnitTypesEditor() {
   const scenario = useStore((s) => s.scenario);
@@ -133,22 +144,32 @@ export default function UnitTypesEditor() {
 
           {(["attack", "defense", "movement", "cost", "fuel_consumption", "frequency"] as const)
             .filter((field) => field !== "fuel_consumption" || t.branch === "motorized")
-            .map((field) => (
-              <div key={field}>
-                <label>{field.replace(/_/g, " ")}</label>
-                <input
-                  type="number"
-                  value={t[field]}
-                  onChange={(e) =>
-                    update((s) => {
-                      const ut = s.unit_types.find((tt) => tt.id === id);
-                      if (ut) ut[field] = Number(e.target.value);
-                      return s;
-                    })
-                  }
-                />
-              </div>
-            ))}
+            .map((field) => {
+              const range = (NUMERIC_FIELD_RANGE as Partial<Record<typeof field, { min: number; max: number }>>)[
+                field
+              ];
+              return (
+                <div key={field}>
+                  <label>{field.replace(/_/g, " ")}</label>
+                  <input
+                    type="number"
+                    min={range?.min}
+                    max={range && range.max !== Infinity ? range.max : undefined}
+                    step={range ? 1 : undefined}
+                    value={t[field]}
+                    onChange={(e) =>
+                      update((s) => {
+                        const ut = s.unit_types.find((tt) => tt.id === id);
+                        if (ut) {
+                          ut[field] = range ? parseIntInRange(e.target.value, range.min, range.max) : Number(e.target.value);
+                        }
+                        return s;
+                      })
+                    }
+                  />
+                </div>
+              );
+            })}
 
           <label>Icon</label>
           <IconUploader

@@ -395,11 +395,32 @@ legend {
 }
 
 .unit-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 50px 50px 50px auto;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.unit-field {
+  display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  gap: 6px;
+}
+
+.unit-field label {
+  display: inline;
+  flex-shrink: 0;
+  width: 60px;
+  margin: 0;
+}
+
+.unit-field input,
+.unit-field select {
+  width: auto;
+  flex: 1;
 }
 
 .icon-uploader {

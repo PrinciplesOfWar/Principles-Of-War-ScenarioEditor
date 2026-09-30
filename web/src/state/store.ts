@@ -366,6 +366,15 @@ export const useStore = create<StoreState>((set, get) => ({
       if (!h) return s;
       // Water hexes can't belong to a faction — always neutral regardless of brush.
       h.faction = h.terrain === "water" ? "neutral" : faction;
+      if (h.faction === "neutral") {
+        // Neutral hexes can't host units.
+        s.units = s.units.filter((u) => !(u.x === x && u.y === y));
+      } else {
+        // A unit's faction always follows the hex it's on.
+        for (const u of s.units) {
+          if (u.x === x && u.y === y) u.faction = h.faction;
+        }
+      }
       return s;
     });
   },

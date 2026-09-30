@@ -1,3 +1,4 @@
+import { parseNonNegativeFloat } from "../../lib/number";
 import { useStore } from "../../state/store";
 import { LABEL_TYPES, LANDMARK_TYPES, TERRAIN_TYPES } from "../../types/scenarioV2";
 
@@ -251,11 +252,12 @@ function LandmarkDetail({ x, y }: { x: number; y: number }) {
         <label>Population</label>
         <input
           type="number"
+          min={0}
           value={landmark.population}
           onChange={(e) =>
             update((s) => {
               const h = s.map.hexagons.find((hh) => hh.x === x && hh.y === y);
-              if (h && h.landmark?.type === "city") h.landmark.population = Number(e.target.value);
+              if (h && h.landmark?.type === "city") h.landmark.population = parseNonNegativeFloat(e.target.value);
               return s;
             })
           }
@@ -270,11 +272,12 @@ function LandmarkDetail({ x, y }: { x: number; y: number }) {
         <label>Production</label>
         <input
           type="number"
+          min={0}
           value={landmark.production}
           onChange={(e) =>
             update((s) => {
               const h = s.map.hexagons.find((hh) => hh.x === x && hh.y === y);
-              if (h && h.landmark?.type === "oilfield") h.landmark.production = Number(e.target.value);
+              if (h && h.landmark?.type === "oilfield") h.landmark.production = parseNonNegativeFloat(e.target.value);
               return s;
             })
           }

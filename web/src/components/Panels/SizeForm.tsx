@@ -1,3 +1,4 @@
+import { parseNonNegativeInt } from "../../lib/number";
 import { useStore } from "../../state/store";
 
 export default function SizeForm() {
@@ -11,16 +12,18 @@ export default function SizeForm() {
       <label>Width</label>
       <input
         type="number"
-        min={1}
+        min={0}
+        step={1}
         value={m.width}
-        onChange={(e) => resizeMap(Number(e.target.value), m.height)}
+        onChange={(e) => resizeMap(parseNonNegativeInt(e.target.value), m.height)}
       />
       <label>Height</label>
       <input
         type="number"
-        min={1}
+        min={0}
+        step={1}
         value={m.height}
-        onChange={(e) => resizeMap(m.width, Number(e.target.value))}
+        onChange={(e) => resizeMap(m.width, parseNonNegativeInt(e.target.value))}
       />
     </div>
   );

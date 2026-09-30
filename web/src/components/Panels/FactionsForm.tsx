@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { parseNonNegativeInt } from "../../lib/number";
 import { useStore } from "../../state/store";
 import type { FactionV2 } from "../../types/scenarioV2";
 
@@ -89,12 +90,16 @@ export default function FactionsForm() {
           <label>Unit cap</label>
           <input
             type="number"
+            min={0}
+            step={1}
             value={draft.units.cap}
             onChange={(e) =>
-              setDraft((d) => (d ? { ...d, units: { ...d.units, cap: Number(e.target.value) } } : d))
+              setDraft((d) => (d ? { ...d, units: { ...d.units, cap: parseNonNegativeInt(e.target.value) } } : d))
             }
           />
-          {(["manpower", "fuel", "airpower"] as const).map((res) => (
+          {/* airpower is intentionally not editable here yet, but stays in the
+              draft/scenario untouched and is still saved on export. */}
+          {(["manpower", "fuel"] as const).map((res) => (
             <fieldset key={res}>
               <legend>{res}</legend>
               <label>Points</label>

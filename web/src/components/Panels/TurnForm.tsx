@@ -1,3 +1,4 @@
+import { parseIntInRange } from "../../lib/number";
 import { useStore } from "../../state/store";
 
 export default function TurnForm() {
@@ -10,10 +11,13 @@ export default function TurnForm() {
       <label>Duration (seconds)</label>
       <input
         type="number"
+        min={1}
+        max={600}
+        step={1}
         value={scenario.turn.duration}
         onChange={(e) =>
           update((s) => {
-            s.turn.duration = Number(e.target.value);
+            s.turn.duration = parseIntInRange(e.target.value, 1, 600);
             return s;
           })
         }

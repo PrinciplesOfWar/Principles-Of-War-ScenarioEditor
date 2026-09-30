@@ -62,7 +62,7 @@ export function drawScenario(
   ctx: CanvasRenderingContext2D,
   scenario: ScenarioV2,
   activeLayer: LayerId,
-  _selected: { x: number; y: number } | null,
+  selected: { x: number; y: number } | null,
   layerSettings: Record<LayerId, LayerSettings>,
   cycledUnitIndex: Record<string, number>,
   referenceImage?: {
@@ -125,6 +125,26 @@ export function drawScenario(
     }
     ctx.restore();
   }
+
+  // The units layer edits the selected hex entirely from the sidebar, so it needs
+  // an on-map outline to show which hex that is.
+  if (activeLayer === "units" && selected) {
+    drawSelectionOutline(ctx, selected.x, selected.y);
+  }
+}
+
+function drawSelectionOutline(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  const { px, py } = hexToPixel(x, y);
+  const corners = hexCorners(px, py);
+  ctx.save();
+  ctx.strokeStyle = "#ffd400";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(corners[0][0], corners[0][1]);
+  for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i][0], corners[i][1]);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
 }
 
 function drawRiverEdges(ctx: CanvasRenderingContext2D, hex: HexagonV2) {
