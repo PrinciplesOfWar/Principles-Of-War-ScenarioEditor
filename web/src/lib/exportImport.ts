@@ -17,7 +17,10 @@ export function computeScenarioForExport(scenario: ScenarioV2): ScenarioV2 {
       h.terrain === "water" && h.faction !== "neutral" ? { ...h, faction: "neutral" } : h
     ),
   };
-  const hash = md5(pyDumpsSorted(withoutVersion));
+  // id/created_at/updated_at are identity & bookkeeping, not scenario content —
+  // excluded so the hash reflects only what the scenario actually contains.
+  const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...hashableMetadata } = withoutVersion.metadata;
+  const hash = md5(pyDumpsSorted({ ...withoutVersion, metadata: hashableMetadata }));
   const now = Math.floor(Date.now() / 1000);
   return {
     ...withoutVersion,
