@@ -44,9 +44,11 @@ body,
   padding: 8px 12px;
 }
 
-.topbar .project-name {
-  color: var(--text-dim);
-  margin-right: auto;
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
 }
 
 .tabstrip {

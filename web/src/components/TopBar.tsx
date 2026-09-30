@@ -46,8 +46,6 @@ export default function TopBar() {
   return (
     <div className="topbar-wrap">
       <div className="topbar">
-        <strong>PoW Map Editor</strong>
-        <button onClick={() => newScenario()}>New tab</button>
         <button onClick={handleImportClick}>Import JSON</button>
         <input
           ref={fileInput}
@@ -57,9 +55,12 @@ export default function TopBar() {
           onChange={handleFileChange}
         />
         <button onClick={handleExport}>Export JSON</button>
-        <button onClick={() => setShowConvert(true)}>Convert v1 → v2</button>
         <button onClick={undo}>Undo</button>
         <button onClick={redo}>Redo</button>
+        <div className="topbar-right">
+          <button onClick={() => setShowConvert(true)}>Convert v1 → v2</button>
+          <strong className="topbar-title">PoW Map Editor</strong>
+        </div>
       </div>
       {showConvert && <ConvertDialog onClose={() => setShowConvert(false)} />}
       <div className="tabstrip">
